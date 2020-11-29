@@ -1,7 +1,7 @@
 using System;
 using Xunit;
 
-namespace IrcMessageParser.Tests
+namespace Twitch.Irc.Tests
 {
     public class UnitTest1
     {
