@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -150,7 +150,7 @@ namespace Twitch.Irc
         {
             var inputStr = input.ToString();
             if (Enum.TryParse(inputStr, out IrcCommand command)
-                && (Enum.IsDefined(typeof(IrcCommand), command) || inputStr.Length == 3))
+                && (Enum.IsDefined(command) || inputStr.Length == 3))
                 return command;
 
             throw new FormatException($"Unknown command format: {inputStr}");
@@ -311,8 +311,8 @@ namespace Twitch.Irc
                     .Append(Hostmask)
                     .Append(' ');
 
-            if (Enum.IsDefined(typeof(IrcCommand), Command))
-                result.Append(Command);
+            if (Enum.IsDefined(Command))
+                result.Append(Enum.GetName(Command));
             else
                 result.Append(((ushort)Command).ToString("d3"));
 
