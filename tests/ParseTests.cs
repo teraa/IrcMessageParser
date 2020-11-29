@@ -9,6 +9,15 @@ namespace Twitch.Irc.Tests
         [InlineData("PING", false, null, IrcCommand.PING, null, null, null)]
         [InlineData("PONG", false, null, IrcCommand.PONG, null, null, null)]
 
+        [InlineData("@tag PING",
+            true, null, IrcCommand.PING, null, null, null)]
+
+        [InlineData("@tag :hostmask PING",
+            true, "hostmask", IrcCommand.PING, null, null, null)]
+
+        [InlineData("@key=value :hostmask PING",
+            true, "hostmask", IrcCommand.PING, null, null, null)]
+
         [InlineData(":hostmask PING arg a",
             false, "hostmask", IrcCommand.PING, "arg a", null, null)]
 
@@ -46,6 +55,27 @@ namespace Twitch.Irc.Tests
             Assert.Equal(arg, actual.Arg);
             Assert.Equal(content, actual.Content);
             Assert.Equal(hasTags, actual.Tags is not null);
+        }
+
+        [Fact]
+        public void TagsParseTest()
+        {
+            var raw = @"@+example=raw+:=,escaped\:\s\\;semicolon=\:;space=\s;backslash=\\;cr=\r;lf=\n;random=1\:\s\\\r\n2;flag;trailing=;overwrite=first;overwrite=last NOTICE";
+            var msg = IrcMessage.Parse(raw);
+
+            Assert.NotNull(msg.Tags);
+            var tags = msg.Tags!;
+            Assert.Equal(10, tags.Count);
+            Assert.Equal(@"raw+:=,escaped; \", tags["+example"]);
+            Assert.Equal(@";", tags["semicolon"]);
+            Assert.Equal(@" ", tags["space"]);
+            Assert.Equal("\\", tags["backslash"]);
+            Assert.Equal("\r", tags["cr"]);
+            Assert.Equal("\n", tags["lf"]);
+            Assert.Equal("1; \\\r\n2", tags["random"]);
+            Assert.Equal("", tags["flag"]);
+            Assert.Equal("", tags["trailing"]);
+            Assert.Equal("last", tags["overwrite"]);
         }
     }
 }

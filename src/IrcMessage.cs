@@ -72,7 +72,7 @@ namespace Twitch.Irc
                     throw new FormatException();
 
                 tags = ParseTags(input[..i]);
-                input = input[i..];
+                input = input[(i + 1)..];
             }
             else
             {
