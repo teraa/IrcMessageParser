@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Xunit;
 
 namespace Twitch.Irc.Tests
@@ -32,7 +31,7 @@ namespace Twitch.Irc.Tests
 
         [InlineData(":hostmask 353 tera = #channel :name1 name2 name3",
             false, "hostmask", (IrcCommand)353, "tera = #channel", "name1 name2 name3", false)]
-        
+
         public void ParseTest(
             string raw,
             bool hasTags,
