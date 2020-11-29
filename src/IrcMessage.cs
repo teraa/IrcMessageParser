@@ -97,14 +97,38 @@ namespace Twitch.Irc
                 command = ParseCommand(input[startIndex..i]);
                 startIndex = i + 1;
 
-                // Arg & Content
-                const string contentStart = " :";
-                i = input[startIndex..].IndexOf(contentStart, StringComparison.Ordinal);
-                if (i != -1)
+                // No Arg
+                if (input[startIndex] == ':')
                 {
-                    i += startIndex;
-                    arg = input[startIndex..i].ToString();
-                    startIndex = i + contentStart.Length;
+                    startIndex++;
+                    arg = null;
+                }
+                else
+                {
+                    const string contentStart = " :";
+                    i = input[startIndex..].IndexOf(contentStart, StringComparison.Ordinal);
+
+                    // No content
+                    if (i == -1)
+                    {
+                        arg = input[startIndex..].ToString();
+                        startIndex = -1;
+                    }
+                    else
+                    {
+                        i += startIndex;
+                        arg = input[startIndex..i].ToString();
+                        startIndex = i + contentStart.Length;
+                    }
+                }
+
+                if (startIndex == -1)
+                {
+                    content = null;
+                    isAction = null;
+                }
+                else
+                {
                     var contentSpan = input[startIndex..];
 
                     isAction = contentSpan.StartsWith(ActionStart, StringComparison.Ordinal);
@@ -112,12 +136,6 @@ namespace Twitch.Irc
                         contentSpan = contentSpan[ActionStart.Length..].TrimEnd(ActionEnd);
 
                     content = contentSpan.ToString();
-                }
-                else
-                {
-                    arg = input[startIndex..].ToString();
-                    content = null;
-                    isAction = null;
                 }
             }
             else

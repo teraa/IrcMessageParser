@@ -10,10 +10,16 @@ namespace Twitch.Irc.Tests
         [InlineData("PONG", null, null, IrcCommand.PONG, null, null, null)]
         [InlineData("PING arg", null, null, IrcCommand.PING, "arg", null, null)]
         [InlineData("PING :content", null, null, IrcCommand.PING, null, "content", false)]
-        [InlineData(":hostmask PONG arg :content", null, "hostmask", IrcCommand.PONG, "arg", "content", false)]
-        [InlineData("CAP REQ :twitch.tv/tags twitch.tv/commands", null, null, IrcCommand.CAP, "REQ", "twitch.tv/tags twitch.tv/commands", false)]
+        
+        [InlineData(":hostmask PONG arg :content",
+            null, "hostmask", IrcCommand.PONG, "arg", "content", false)]
+
+        [InlineData("CAP REQ :twitch.tv/tags twitch.tv/commands",
+            null, null, IrcCommand.CAP, "REQ", "twitch.tv/tags twitch.tv/commands", false)]
+
         [InlineData(":hostmask 353 tera = #channel :name1 name2 name3",
             null, "hostmask", (IrcCommand)353, "tera = #channel", "name1 name2 name3", false)]
+
         public void ParseTest(
             string raw,
             Dictionary<string, string> tags,
