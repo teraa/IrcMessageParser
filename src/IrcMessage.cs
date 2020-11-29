@@ -42,7 +42,7 @@ namespace Twitch.Irc
         public string? Content { get; init; }
         public bool? IsAction { get; init; }
 
-        internal IrcMessage() { }
+        public IrcMessage() { }
 
         /// <summary>
         ///     Parses the <see cref="IrcMessage"/> from a raw IRC message (<paramref name="input"/>).
@@ -50,7 +50,7 @@ namespace Twitch.Irc
         /// <param name="input">Raw IRC message.</param>
         /// <returns><see cref="IrcMessage"/> instance parsed from <paramref name="input"/>.</returns>
         /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
-        internal static IrcMessage Parse(ReadOnlySpan<char> input)
+        public static IrcMessage Parse(ReadOnlySpan<char> input)
         {
             IReadOnlyDictionary<string, string>? tags;
             IrcCommand command;
@@ -146,7 +146,7 @@ namespace Twitch.Irc
         /// <param name="input">Input to parse.</param>
         /// <returns><see cref="IrcCommand"/>.</returns>
         /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
-        internal static IrcCommand ParseCommand(ReadOnlySpan<char> input)
+        public static IrcCommand ParseCommand(ReadOnlySpan<char> input)
         {
             var inputStr = input.ToString();
             if (Enum.TryParse(inputStr, out IrcCommand command)
@@ -163,7 +163,7 @@ namespace Twitch.Irc
         /// <param name="input">Tags part of the IRC message.</param>
         /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
         /// <exception cref="ArgumentException"><paramref name="input"/> is empty.</exception>
-        internal static ReadOnlyDictionary<string, string> ParseTags(ReadOnlySpan<char> input)
+        public static ReadOnlyDictionary<string, string> ParseTags(ReadOnlySpan<char> input)
         {
             if (input == null)
                 throw new ArgumentNullException(nameof(input));
@@ -208,7 +208,7 @@ namespace Twitch.Irc
         /// <param name="input">Escaped value of a message tag.</param>
         /// <returns>Parsed value of the message tag.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
-        internal static string ParseTagValue(ReadOnlySpan<char> input)
+        public static string ParseTagValue(ReadOnlySpan<char> input)
         {
             if (input == null)
                 throw new ArgumentNullException(nameof(input));
@@ -249,7 +249,7 @@ namespace Twitch.Irc
         /// <param name="input">Parsed value of a message tag.</param>
         /// <returns>Escaped value of the message tag.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
-        internal static string EscapeTagValue(ReadOnlySpan<char> input)
+        public static string EscapeTagValue(ReadOnlySpan<char> input)
         {
             if (input == null)
                 throw new ArgumentNullException(nameof(input));
