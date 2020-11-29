@@ -6,33 +6,32 @@ namespace Twitch.Irc.Tests
     public class ParseTests
     {
         [Theory]
-        [InlineData("PING", null, null, IrcCommand.PING, null, null, null)]
-        [InlineData("PONG", null, null, IrcCommand.PONG, null, null, null)]
+        [InlineData("PING", false, null, IrcCommand.PING, null, null, null)]
+        [InlineData("PONG", false, null, IrcCommand.PONG, null, null, null)]
 
         [InlineData(":hostmask PING arg a",
-            null, "hostmask", IrcCommand.PING, "arg a", null, null)]
+            false, "hostmask", IrcCommand.PING, "arg a", null, null)]
 
         [InlineData(":hostmask PING :content c",
-            null, "hostmask", IrcCommand.PING, null, "content c", false)]
+            false, "hostmask", IrcCommand.PING, null, "content c", false)]
 
         [InlineData(":hostmask PONG arg a :content c",
-            null, "hostmask", IrcCommand.PONG, "arg a", "content c", false)]
+            false, "hostmask", IrcCommand.PONG, "arg a", "content c", false)]
 
         [InlineData("CAP REQ :twitch.tv/tags twitch.tv/commands",
-            null, null, IrcCommand.CAP, "REQ", "twitch.tv/tags twitch.tv/commands", false)]
+            false, null, IrcCommand.CAP, "REQ", "twitch.tv/tags twitch.tv/commands", false)]
 
         [InlineData(":hostmask 353 tera = #channel :name1 name2 name3",
-            null, "hostmask", (IrcCommand)353, "tera = #channel", "name1 name2 name3", false)]
-
+            false, "hostmask", (IrcCommand)353, "tera = #channel", "name1 name2 name3", false)]
+        
         public void ParseTest(
             string raw,
-            Dictionary<string, string> tags,
+            bool hasTags,
             string? hostmask,
             IrcCommand command,
             string? arg,
             string? contentText,
-            bool? isAction,
-            bool checkTags = false)
+            bool? isAction)
         {
             var actual = IrcMessage.Parse(raw);
 
@@ -46,18 +45,7 @@ namespace Twitch.Irc.Tests
             Assert.Equal(command, actual.Command);
             Assert.Equal(arg, actual.Arg);
             Assert.Equal(content, actual.Content);
-
-            Assert.Equal(tags is null, actual.Tags is null);
-
-            if (checkTags)
-            {
-                Assert.Equal(tags!.Count, actual.Tags!.Count);
-                foreach (var (k, _) in tags)
-                {
-                    Assert.True(actual.Tags.ContainsKey(k));
-                    Assert.Equal(tags[k], actual.Tags[k]);
-                }
-            }
+            Assert.Equal(hasTags, actual.Tags is not null);
         }
     }
 }
