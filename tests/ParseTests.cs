@@ -8,11 +8,15 @@ namespace Twitch.Irc.Tests
         [Theory]
         [InlineData("PING", null, null, IrcCommand.PING, null, null, null)]
         [InlineData("PONG", null, null, IrcCommand.PONG, null, null, null)]
-        [InlineData("PING arg", null, null, IrcCommand.PING, "arg", null, null)]
-        [InlineData("PING :content", null, null, IrcCommand.PING, null, "content", false)]
+
+        [InlineData(":hostmask PING arg a",
+            null, "hostmask", IrcCommand.PING, "arg a", null, null)]
+
+        [InlineData(":hostmask PING :content c",
+            null, "hostmask", IrcCommand.PING, null, "content c", false)]
         
-        [InlineData(":hostmask PONG arg :content",
-            null, "hostmask", IrcCommand.PONG, "arg", "content", false)]
+        [InlineData(":hostmask PONG arg a :content c",
+            null, "hostmask", IrcCommand.PONG, "arg a", "content c", false)]
 
         [InlineData("CAP REQ :twitch.tv/tags twitch.tv/commands",
             null, null, IrcCommand.CAP, "REQ", "twitch.tv/tags twitch.tv/commands", false)]
