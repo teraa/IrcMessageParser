@@ -51,23 +51,28 @@ namespace Twitch.Irc
         /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
         public static IrcMessage Parse(ReadOnlySpan<char> input)
         {
+            if (input.IsEmpty)
+                throw new ArgumentException("Argument cannot be empty", nameof(input));
+
             IReadOnlyDictionary<string, string>? tags;
             string? hostmask;
             IrcCommand command;
             string? arg;
             (string Text, bool IsAction)? content;
 
-            int i, startIndex = 0;
+            int i;
 
             // Tags
-            if (input[startIndex] == '@')
+            if (input[0] == '@')
             {
-                startIndex++;
-                i = input[startIndex..].IndexOf(' ');
-                i += i != -1 ? startIndex : throw new FormatException();
+                input = input[1..];
+                i = input.IndexOf(' ');
 
-                tags = ParseTags(input[startIndex..i]);
-                startIndex = i + 1;
+                if (i == -1)
+                    throw new FormatException();
+
+                tags = ParseTags(input[..i]);
+                input = input[i..];
             }
             else
             {
@@ -75,14 +80,16 @@ namespace Twitch.Irc
             }
 
             // Hostmask
-            if (input[startIndex] == ':')
+            if (input[0] == ':')
             {
-                startIndex++;
-                i = input[startIndex..].IndexOf(' ');
-                i += i != -1 ? startIndex : throw new FormatException();
+                input = input[1..];
+                i = input.IndexOf(' ');
 
-                hostmask = input[startIndex..i].ToString();
-                startIndex = i + 1;
+                if (i == -1)
+                    throw new FormatException();
+
+                hostmask = input[..i].ToString();
+                input = input[(i + 1)..];
             }
             else
             {
@@ -90,58 +97,54 @@ namespace Twitch.Irc
             }
 
             // Command
-            i = input[startIndex..].IndexOf(' ');
+            i = input.IndexOf(' ');
             if (i != -1)
             {
-                i += startIndex;
-                command = ParseCommand(input[startIndex..i]);
-                startIndex = i + 1;
+                command = ParseCommand(input[..i]);
+                input = input[(i + 1)..];
 
                 // No Arg
-                if (input[startIndex] == ':')
+                if (input[0] == ':')
                 {
-                    startIndex++;
+                    input = input[1..];
                     arg = null;
                 }
                 else
                 {
                     const string contentStart = " :";
-                    i = input[startIndex..].IndexOf(contentStart, StringComparison.Ordinal);
+                    i = input.IndexOf(contentStart, StringComparison.Ordinal);
 
                     // No content
                     if (i == -1)
                     {
-                        arg = input[startIndex..].ToString();
-                        startIndex = -1;
+                        arg = input.ToString();
+                        input = null;
                     }
                     else
                     {
-                        i += startIndex;
-                        arg = input[startIndex..i].ToString();
-                        startIndex = i + contentStart.Length;
+                        arg = input[..i].ToString();
+                        input = input[(i + contentStart.Length)..];
                     }
                 }
 
-                if (startIndex == -1)
+                if (input.IsEmpty)
                 {
                     content = null;
                 }
                 else
                 {
-                    var contentSpan = input[startIndex..];
-
-                    var isAction = contentSpan.StartsWith(ActionStart, StringComparison.Ordinal);
+                    var isAction = input.StartsWith(ActionStart, StringComparison.Ordinal);
                     if (isAction == true)
-                        contentSpan = contentSpan[ActionStart.Length..].TrimEnd(ActionEnd);
+                        input = input[ActionStart.Length..].TrimEnd(ActionEnd);
 
-                    var text = contentSpan.ToString();
+                    var text = input.ToString();
 
                     content = (text, isAction);
                 }
             }
             else
             {
-                command = ParseCommand(input[startIndex..]);
+                command = ParseCommand(input);
                 arg = null;
                 content = null;
             }
@@ -182,9 +185,6 @@ namespace Twitch.Irc
         /// <exception cref="ArgumentException"><paramref name="input"/> is empty.</exception>
         public static ReadOnlyDictionary<string, string> ParseTags(ReadOnlySpan<char> input)
         {
-            if (input == null)
-                throw new ArgumentNullException(nameof(input));
-
             if (input.IsEmpty)
                 throw new ArgumentException("Argument cannot be empty", nameof(input));
 
@@ -227,9 +227,6 @@ namespace Twitch.Irc
         /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
         public static string ParseTagValue(ReadOnlySpan<char> input)
         {
-            if (input == null)
-                throw new ArgumentNullException(nameof(input));
-
             var result = new StringBuilder();
             int lastSplit = 0;
             for (int i = 0; i < input.Length - 1; i++)
@@ -268,9 +265,6 @@ namespace Twitch.Irc
         /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
         public static string EscapeTagValue(ReadOnlySpan<char> input)
         {
-            if (input == null)
-                throw new ArgumentNullException(nameof(input));
-
             var result = new StringBuilder();
             int lastSplit = 0;
             for (int i = 0; i < input.Length; i++)
@@ -285,7 +279,7 @@ namespace Twitch.Irc
                     _ => null
                 };
 
-                if (escaped != null)
+                if (escaped is not null)
                 {
                     result
                         .Append(input[lastSplit..i])
@@ -304,7 +298,7 @@ namespace Twitch.Irc
         {
             var result = new StringBuilder();
 
-            if (Tags != null)
+            if (Tags is not null)
             {
                 result.Append('@');
 
@@ -322,7 +316,7 @@ namespace Twitch.Irc
                 result.Append(' ');
             }
 
-            if (Hostmask != null)
+            if (Hostmask is not null)
                 result
                     .Append(':')
                     .Append(Hostmask)
@@ -333,12 +327,12 @@ namespace Twitch.Irc
             else
                 result.Append(((ushort)Command).ToString("d3"));
 
-            if (Arg != null)
+            if (Arg is not null)
                 result
                     .Append(' ')
                     .Append(Arg);
 
-            if (Content != null)
+            if (Content is not null)
             {
                 result.Append(" :");
 
