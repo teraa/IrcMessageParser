@@ -14,7 +14,7 @@ namespace Twitch.Irc.Tests
 
         [InlineData(":hostmask PING :content c",
             null, "hostmask", IrcCommand.PING, null, "content c", false)]
-        
+
         [InlineData(":hostmask PONG arg a :content c",
             null, "hostmask", IrcCommand.PONG, "arg a", "content c", false)]
 
@@ -30,17 +30,22 @@ namespace Twitch.Irc.Tests
             string? hostmask,
             IrcCommand command,
             string? arg,
-            string? content,
+            string? contentText,
             bool? isAction,
             bool checkTags = false)
         {
             var actual = IrcMessage.Parse(raw);
 
-            Assert.Equal(arg, actual.Arg);
-            Assert.Equal(command, actual.Command);
-            Assert.Equal(content, actual.Content);
+            (string Text, bool IsAction)? content;
+            if (contentText is not null && isAction.HasValue)
+                content = (contentText, isAction.Value);
+            else
+                content = null;
+
             Assert.Equal(hostmask, actual.Hostmask);
-            Assert.Equal(isAction, actual.IsAction);
+            Assert.Equal(command, actual.Command);
+            Assert.Equal(arg, actual.Arg);
+            Assert.Equal(content, actual.Content);
 
             Assert.Equal(tags is null, actual.Tags is null);
 

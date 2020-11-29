@@ -39,8 +39,7 @@ namespace Twitch.Irc
         public string? Hostmask { get; init; }
         public IrcCommand Command { get; init; }
         public string? Arg { get; init; }
-        public string? Content { get; init; }
-        public bool? IsAction { get; init; }
+        public (string Text, bool IsAction)? Content { get; init; }
 
         public IrcMessage() { }
 
@@ -53,9 +52,10 @@ namespace Twitch.Irc
         public static IrcMessage Parse(ReadOnlySpan<char> input)
         {
             IReadOnlyDictionary<string, string>? tags;
+            string? hostmask;
             IrcCommand command;
-            string? hostmask, arg, content;
-            bool? isAction;
+            string? arg;
+            (string Text, bool IsAction)? content;
 
             int i, startIndex = 0;
 
@@ -125,17 +125,18 @@ namespace Twitch.Irc
                 if (startIndex == -1)
                 {
                     content = null;
-                    isAction = null;
                 }
                 else
                 {
                     var contentSpan = input[startIndex..];
 
-                    isAction = contentSpan.StartsWith(ActionStart, StringComparison.Ordinal);
+                    var isAction = contentSpan.StartsWith(ActionStart, StringComparison.Ordinal);
                     if (isAction == true)
                         contentSpan = contentSpan[ActionStart.Length..].TrimEnd(ActionEnd);
 
-                    content = contentSpan.ToString();
+                    var text = contentSpan.ToString();
+
+                    content = (text, isAction);
                 }
             }
             else
@@ -143,7 +144,6 @@ namespace Twitch.Irc
                 command = ParseCommand(input[startIndex..]);
                 arg = null;
                 content = null;
-                isAction = null;
             }
 
             return new IrcMessage
@@ -152,7 +152,6 @@ namespace Twitch.Irc
                 Command = command,
                 Content = content,
                 Hostmask = hostmask,
-                IsAction = isAction,
                 Tags = tags
             };
         }
@@ -343,13 +342,13 @@ namespace Twitch.Irc
             {
                 result.Append(" :");
 
-                if (IsAction == true)
+                if (Content.Value.IsAction)
                     result
                         .Append(ActionStart)
-                        .Append(Content)
+                        .Append(Content.Value.Text)
                         .Append(ActionEnd);
                 else
-                    result.Append(Content);
+                    result.Append(Content.Value.Text);
             }
 
 
