@@ -32,6 +32,12 @@ namespace Twitch.Irc.Tests
         [InlineData(":hostmask 353 tera = #channel :name1 name2 name3",
             false, "hostmask", (IrcCommand)353, "tera = #channel", "name1 name2 name3", false)]
 
+        [InlineData("PRIVMSG #channel :\u0001ACTION Test",
+            false, null, IrcCommand.PRIVMSG, "#channel", "Test", true)]
+
+        [InlineData("PRIVMSG #channel :\u0001ACTION Test\u0001",
+            false, null, IrcCommand.PRIVMSG, "#channel", "Test", true)]
+
         public void ParseTest(
             string raw,
             bool hasTags,
