@@ -32,14 +32,13 @@ namespace Twitch.Irc
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class IrcMessage
     {
-        private const string ActionStart = "\u0001ACTION ";
-        private const char ActionEnd = '\u0001';
+        private const char CtcpDelimiter = '\u0001';
 
         public IReadOnlyDictionary<string, string>? Tags { get; init; }
         public string? Hostmask { get; init; }
         public IrcCommand Command { get; init; }
         public string? Arg { get; init; }
-        public (string Text, bool IsAction)? Content { get; init; }
+        public (string Text, string? Ctcp)? Content { get; init; }
 
         public IrcMessage() { }
 
@@ -58,7 +57,7 @@ namespace Twitch.Irc
             string? hostmask;
             IrcCommand command;
             string? arg;
-            (string Text, bool IsAction)? content;
+            (string Text, string? Ctcp)? content;
 
             int i;
 
@@ -133,13 +132,29 @@ namespace Twitch.Irc
                 }
                 else
                 {
-                    var isAction = input.StartsWith(ActionStart, StringComparison.Ordinal);
-                    if (isAction == true)
-                        input = input[ActionStart.Length..].TrimEnd(ActionEnd);
+                    string? ctcp;
+                    if (input[0] == CtcpDelimiter)
+                    {
+                        input = input[1..];
+                        if (input[^1] == CtcpDelimiter)
+                            input = input[..^1];
+                        
+                        i = input.IndexOf(' ');
+
+                        if (i == -1)
+                            throw new FormatException();
+                        
+                        ctcp = input[..i].ToString();
+                        input = input[(i + 1)..];
+                    }
+                    else
+                    {
+                        ctcp = null;
+                    }
 
                     var text = input.ToString();
 
-                    content = (text, isAction);
+                    content = (text, ctcp);
                 }
             }
             else
@@ -336,11 +351,13 @@ namespace Twitch.Irc
             {
                 result.Append(" :");
 
-                if (Content.Value.IsAction)
+                if (Content.Value.Ctcp is not null)
                     result
-                        .Append(ActionStart)
+                        .Append(CtcpDelimiter)
+                        .Append(Content.Value.Ctcp)
+                        .Append(' ')
                         .Append(Content.Value.Text)
-                        .Append(ActionEnd);
+                        .Append(CtcpDelimiter);
                 else
                     result.Append(Content.Value.Text);
             }

@@ -21,22 +21,22 @@ namespace Twitch.Irc.Tests
             false, "hostmask", IrcCommand.PING, "arg a", null, null)]
 
         [InlineData(":hostmask PING :content c",
-            false, "hostmask", IrcCommand.PING, null, "content c", false)]
+            false, "hostmask", IrcCommand.PING, null, "content c", null)]
 
         [InlineData(":hostmask PONG arg a :content c",
-            false, "hostmask", IrcCommand.PONG, "arg a", "content c", false)]
+            false, "hostmask", IrcCommand.PONG, "arg a", "content c", null)]
 
         [InlineData("CAP REQ :twitch.tv/tags twitch.tv/commands",
-            false, null, IrcCommand.CAP, "REQ", "twitch.tv/tags twitch.tv/commands", false)]
+            false, null, IrcCommand.CAP, "REQ", "twitch.tv/tags twitch.tv/commands", null)]
 
         [InlineData(":hostmask 353 tera = #channel :name1 name2 name3",
-            false, "hostmask", (IrcCommand)353, "tera = #channel", "name1 name2 name3", false)]
+            false, "hostmask", (IrcCommand)353, "tera = #channel", "name1 name2 name3", null)]
 
         [InlineData("PRIVMSG #channel :\u0001ACTION Test",
-            false, null, IrcCommand.PRIVMSG, "#channel", "Test", true)]
+            false, null, IrcCommand.PRIVMSG, "#channel", "Test", "ACTION")]
 
         [InlineData("PRIVMSG #channel :\u0001ACTION Test\u0001",
-            false, null, IrcCommand.PRIVMSG, "#channel", "Test", true)]
+            false, null, IrcCommand.PRIVMSG, "#channel", "Test", "ACTION")]
 
         public void ParseTest(
             string raw,
@@ -45,13 +45,13 @@ namespace Twitch.Irc.Tests
             IrcCommand command,
             string? arg,
             string? contentText,
-            bool? isAction)
+            string? contentCtcp)
         {
             var actual = IrcMessage.Parse(raw);
 
-            (string Text, bool IsAction)? content;
-            if (contentText is not null && isAction.HasValue)
-                content = (contentText, isAction.Value);
+            (string Text, string? Ctcp)? content;
+            if (contentText is not null)
+                content = (contentText, contentCtcp);
             else
                 content = null;
 
