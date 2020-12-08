@@ -29,6 +29,9 @@ namespace Twitch.Irc.Tests
         [InlineData("CAP REQ :twitch.tv/tags twitch.tv/commands",
             false, null, IrcCommand.CAP, "REQ", "twitch.tv/tags twitch.tv/commands", null)]
 
+        [InlineData(":tmi.twitch.tv CAP * ACK :twitch.tv/tags twitch.tv/commands",
+            false, "tmi.twitch.tv", IrcCommand.CAP, "* ACK", "twitch.tv/tags twitch.tv/commands", null)]
+
         [InlineData(":hostmask 353 tera = #channel :name1 name2 name3",
             false, "hostmask", (IrcCommand)353, "tera = #channel", "name1 name2 name3", null)]
 
