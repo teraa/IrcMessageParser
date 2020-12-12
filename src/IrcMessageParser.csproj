@@ -10,6 +10,7 @@
     <Authors>teraa</Authors>
     <Company>teraa</Company>
     <PackageTags>irc;parser</PackageTags>
+    <Description>IRC Message Parser</Description>
     <PackageProjectUrl>https://github.com/teraa/IrcMessageParser</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/teraa/IrcMessageParser</RepositoryUrl>
