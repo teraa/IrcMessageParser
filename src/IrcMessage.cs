@@ -68,7 +68,7 @@ namespace IrcMessageParser
                 i = input.IndexOf(' ');
 
                 if (i == -1)
-                    throw new FormatException();
+                    throw new FormatException("Missing tags ending");
 
                 tags = ParseTags(input[..i]);
                 input = input[(i + 1)..];
@@ -85,7 +85,7 @@ namespace IrcMessageParser
                 i = input.IndexOf(' ');
 
                 if (i == -1)
-                    throw new FormatException();
+                    throw new FormatException("Missing hostmask ending");
 
                 hostmask = input[..i].ToString();
                 input = input[(i + 1)..];
@@ -142,7 +142,7 @@ namespace IrcMessageParser
                         i = input.IndexOf(' ');
 
                         if (i == -1)
-                            throw new FormatException();
+                            throw new FormatException("Missing CTCP ending");
 
                         ctcp = input[..i].ToString();
                         input = input[(i + 1)..];
@@ -188,7 +188,7 @@ namespace IrcMessageParser
                 && (Enum.IsDefined(command) || inputStr.Length == 3))
                 return command;
 
-            throw new FormatException($"Unknown command format: {inputStr}");
+            throw new FormatException($"Invalid command format: {inputStr}");
         }
 
         /// <summary>
