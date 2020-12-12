@@ -6,7 +6,7 @@
     <RootNamespace>IrcMessageParser</RootNamespace>
     <Nullable>enable</Nullable>
     <PackageId>Teraa.IrcMessageParser</PackageId>
-    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionPrefix>1.0.1</VersionPrefix>
     <Authors>teraa</Authors>
     <Company>teraa</Company>
     <PackageTags>irc;parser</PackageTags>
