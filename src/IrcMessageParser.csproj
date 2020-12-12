@@ -9,7 +9,7 @@
     <VersionPrefix>1.0.1</VersionPrefix>
     <Authors>teraa</Authors>
     <Company>teraa</Company>
-    <PackageTags>irc;parser</PackageTags>
+    <PackageTags>IRC;Parser</PackageTags>
     <Description>IRC Message Parser</Description>
     <PackageProjectUrl>https://github.com/teraa/IrcMessageParser</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
