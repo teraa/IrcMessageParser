@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <RootNamespace>Twitch.Irc</RootNamespace>
+    <RootNamespace>IrcMessageParser</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

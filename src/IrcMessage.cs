@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text;
 
-namespace Twitch.Irc
+namespace IrcMessageParser
 {
     public enum IrcCommand : ushort
     {

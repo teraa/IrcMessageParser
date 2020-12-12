@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace Twitch.Irc.Tests
+namespace IrcMessageParser.Tests
 {
     public class ParseTests
     {
