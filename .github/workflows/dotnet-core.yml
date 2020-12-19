@@ -42,7 +42,7 @@ jobs:
       run: dotnet pack --configuration Release --no-build --output nupkgs
 
     - name: Upload Artifacts
-      if: (steps.pack-release == 'success') || (steps.pack-prerelease == 'success')
+      if: (steps.pack-release.outcome == 'success') || (steps.pack-prerelease.outcome == 'success')
       uses: actions/upload-artifact@v2
       with:
         name: nupkgs
