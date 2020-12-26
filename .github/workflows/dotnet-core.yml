@@ -2,7 +2,7 @@ name: .NET Core
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, dev ]
   pull_request:
     branches: [ master ]
   release:
@@ -72,7 +72,7 @@ jobs:
       run: dotnet nuget push "nupkgs/*.nupkg" --source https://nuget.pkg.github.com/teraa/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
 
     - name: Push (NuGet.org)
-      if: github.event_name == 'release'
+      if: (github.event_name == 'release') || (github.ref == 'refs/heads/master')
       run: dotnet nuget push "nupkgs/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
 
 env:
