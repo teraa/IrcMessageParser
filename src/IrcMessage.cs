@@ -32,13 +32,11 @@ namespace IrcMessageParser
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class IrcMessage
     {
-        private const char CtcpDelimiter = '\u0001';
-
         public IReadOnlyDictionary<string, string>? Tags { get; init; }
         public string? Hostmask { get; init; }
         public IrcCommand Command { get; init; }
         public string? Arg { get; init; }
-        public (string Text, string? Ctcp)? Content { get; init; }
+        public MessageContent? Content { get; init; }
 
         public IrcMessage() { }
 
@@ -57,7 +55,7 @@ namespace IrcMessageParser
             string? hostmask;
             IrcCommand command;
             string? arg;
-            (string Text, string? Ctcp)? content;
+            MessageContent? content;
 
             int i;
 
@@ -126,36 +124,9 @@ namespace IrcMessageParser
                     }
                 }
 
-                if (input.IsEmpty)
-                {
-                    content = null;
-                }
-                else
-                {
-                    string? ctcp;
-                    if (input[0] == CtcpDelimiter)
-                    {
-                        input = input[1..];
-                        if (input[^1] == CtcpDelimiter)
-                            input = input[..^1];
-
-                        i = input.IndexOf(' ');
-
-                        if (i == -1)
-                            throw new FormatException("Missing CTCP ending");
-
-                        ctcp = input[..i].ToString();
-                        input = input[(i + 1)..];
-                    }
-                    else
-                    {
-                        ctcp = null;
-                    }
-
-                    var text = input.ToString();
-
-                    content = (text, ctcp);
-                }
+                content = input.IsEmpty
+                    ? null
+                    : MessageContent.Parse(input);
             }
             else
             {
@@ -347,19 +318,9 @@ namespace IrcMessageParser
                     .Append(Arg);
 
             if (Content is not null)
-            {
-                result.Append(" :");
-
-                if (Content.Value.Ctcp is not null)
-                    result
-                        .Append(CtcpDelimiter)
-                        .Append(Content.Value.Ctcp)
-                        .Append(' ')
-                        .Append(Content.Value.Text)
-                        .Append(CtcpDelimiter);
-                else
-                    result.Append(Content.Value.Text);
-            }
+                result
+                    .Append(" :")
+                    .Append(Content);
 
 
             return result.ToString();

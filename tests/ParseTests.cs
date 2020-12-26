@@ -52,9 +52,9 @@ namespace IrcMessageParser.Tests
         {
             var actual = IrcMessage.Parse(raw);
 
-            (string Text, string? Ctcp)? content;
+            MessageContent? content;
             if (contentText is not null)
-                content = (contentText, contentCtcp);
+                content = new MessageContent(contentText, contentCtcp);
             else
                 content = null;
 
