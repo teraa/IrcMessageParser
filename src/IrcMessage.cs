@@ -290,16 +290,21 @@ namespace IrcMessageParser
         {
             var result = new StringBuilder();
 
-            if (Tags is not null && Tags.Count > 0)
+            if (Tags is { Count: > 0 })
             {
                 result.Append('@');
 
                 foreach (var (key, value) in Tags)
-                    result
-                        .Append(key)
-                        .Append('=')
-                        .Append(EscapeTagValue(value))
-                        .Append(';');
+                {
+                    result.Append(key);
+
+                    if (value is { Length: > 0 })
+                        result
+                            .Append('=')
+                            .Append(EscapeTagValue(value));
+                    
+                    result.Append(';');
+                }
 
                 // Remove trailing semicolon
                 result.Remove(result.Length - 1, 1);
