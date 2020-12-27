@@ -175,31 +175,38 @@ namespace IrcMessageParser
 
             var tags = new Dictionary<string, string>();
 
-            int i = -1, startIndex;
+            int i;
+            ReadOnlySpan<char> tag;
             do
             {
-                startIndex = i + 1;
-                i = input[startIndex..].IndexOf(';');
-                var endIndex = i == -1 ? ^0 : i += startIndex;
-
-                var tag = input[startIndex..endIndex];
+                i = input.IndexOf(';');
+                if (i == -1)
+                {
+                    tag = input;
+                    input = default;
+                }
+                else
+                {
+                    tag = input[..i];
+                    input = input[(i + 1)..];
+                }
 
                 string key, value;
-                var splitIndex = tag.IndexOf('=');
-                if (splitIndex == -1)
+                i = tag.IndexOf('=');
+                if (i == -1)
                 {
                     key = tag.ToString();
                     value = "";
                 }
                 else
                 {
-                    key = tag[..splitIndex].ToString();
-                    value = ParseTagValue(tag[(splitIndex + 1)..]);
+                    key = tag[..i].ToString();
+                    value = ParseTagValue(tag[(i + 1)..]);
                 }
 
                 tags[key] = value;
 
-            } while (i != -1);
+            } while (!input.IsEmpty);
 
             return tags;
         }
