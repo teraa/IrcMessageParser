@@ -34,14 +34,14 @@ jobs:
 
     - name: Pack (Prerelease)
       id: pack-prerelease
-      if: github.event_name == 'push'
+      if: >
+        (github.event_name == 'push') ||
+        (github.event_name == 'workflow_dispatch')
       run: dotnet pack --configuration Release --no-build --output nupkgs --version-suffix alpha.$GITHUB_RUN_NUMBER
 
     - name: Pack (Release)
       id: pack-release
-      if: >
-        (github.event_name == 'release') ||
-        (github.event_name == 'workflow_dispatch')
+      if: github.event_name == 'release'
       run: dotnet pack --configuration Release --no-build --output nupkgs
 
     - name: Upload Artifacts
