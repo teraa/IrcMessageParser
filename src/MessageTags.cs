@@ -74,16 +74,18 @@ namespace IrcMessageParser
         /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
         public static string ParseValue(ReadOnlySpan<char> input)
         {
-            var result = new StringBuilder();
-            int lastSplit = 0;
-            for (int i = 0; i < input.Length - 1; i++)
-            {
-                if (input[i] == '\\')
-                {
-                    result.Append(input[lastSplit..i]);
+            if (input.IsEmpty) return "";
 
-                    i++;
-                    var next = input[i];
+            var result = new StringBuilder();
+            int i = 0;
+            for (int j = 0; j < input.Length - 1; j++)
+            {
+                if (input[j] == '\\')
+                {
+                    result.Append(input[i..j]);
+
+                    j++;
+                    var next = input[j];
                     var parsed = next switch
                     {
                         '\\' => '\\',
@@ -95,11 +97,11 @@ namespace IrcMessageParser
                     };
 
                     result.Append(parsed);
-                    lastSplit = i + 1;
+                    i = j + 1;
                 }
             }
 
-            result.Append(input[lastSplit..]);
+            result.Append(input[i..]);
 
             return result.ToString();
         }
@@ -112,11 +114,13 @@ namespace IrcMessageParser
         /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
         public static string EscapeValue(ReadOnlySpan<char> input)
         {
+            if (input.IsEmpty) return "";
+
             var result = new StringBuilder();
-            int lastSplit = 0;
-            for (int i = 0; i < input.Length; i++)
+            int i = 0;
+            for (int j = 0; j < input.Length; j++)
             {
-                var escaped = input[i] switch
+                var escaped = input[j] switch
                 {
                     '\\' => @"\\",
                     ';' => @"\:",
@@ -129,14 +133,14 @@ namespace IrcMessageParser
                 if (escaped is not null)
                 {
                     result
-                        .Append(input[lastSplit..i])
+                        .Append(input[i..j])
                         .Append(escaped);
 
-                    lastSplit = i + 1;
+                    i = j + 1;
                 }
             }
 
-            result.Append(input[lastSplit..]);
+            result.Append(input[i..]);
 
             return result.ToString();
         }
