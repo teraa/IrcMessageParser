@@ -23,6 +23,9 @@ namespace IrcMessageParser
             return $"{CtcpDelimiter}{content.Ctcp} {content.Text}{CtcpDelimiter}";
         }
 
+        public static explicit operator MessageContent(string s)
+            => Parse(s);
+
         public static MessageContent Parse(ReadOnlySpan<char> input)
         {
             string? ctcp;
