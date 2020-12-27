@@ -72,8 +72,8 @@ namespace IrcMessageParser.Tests
             var msg = IrcMessage.Parse(raw);
 
             Assert.NotNull(msg.Tags);
-            Assert.Equal(1, msg.Tags!.Count);
-            Assert.Equal("value", msg.Tags["key"]);
+            Assert.Single(msg.Tags);
+            Assert.Equal("value", msg.Tags!["key"]);
             Assert.Equal("hostmask", msg.Hostmask);
             Assert.Equal(IrcCommand.PRIVMSG, msg.Command);
             Assert.Equal("#channel", msg.Arg);
