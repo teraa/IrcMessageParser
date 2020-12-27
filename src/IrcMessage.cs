@@ -302,7 +302,7 @@ namespace IrcMessageParser
                         result
                             .Append('=')
                             .Append(EscapeTagValue(value));
-                    
+
                     result.Append(';');
                 }
 

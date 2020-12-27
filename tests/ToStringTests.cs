@@ -42,7 +42,7 @@ namespace IrcMessageParser.Tests
                 Arg = "REQ",
                 Content = new("twitch.tv/tags twitch.tv/commands"),
             };
-            
+
             Assert.Equal("CAP REQ :twitch.tv/tags twitch.tv/commands", message.ToString());
         }
 
@@ -56,7 +56,7 @@ namespace IrcMessageParser.Tests
                 Arg = "tera = #channel",
                 Content = new("name1 name2 name3"),
             };
-            
+
             Assert.Equal(":hostmask 353 tera = #channel :name1 name2 name3", message.ToString());
         }
 
@@ -69,7 +69,7 @@ namespace IrcMessageParser.Tests
                 Arg = "#channel",
                 Content = new("hi", "ACTION"),
             };
-            
+
             Assert.Equal("PRIVMSG #channel :\u0001ACTION hi\u0001", message.ToString());
         }
 

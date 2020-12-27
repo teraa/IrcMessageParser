@@ -19,7 +19,7 @@ namespace IrcMessageParser
         {
             if (content.Ctcp is null)
                 return content.Text;
-            
+
             return $"{CtcpDelimiter}{content.Ctcp} {content.Text}{CtcpDelimiter}";
         }
 
