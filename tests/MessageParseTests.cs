@@ -2,7 +2,7 @@ using Xunit;
 
 namespace IrcMessageParser.Tests
 {
-    public class ParseTests
+    public class MessageParseTests
     {
         [Theory]
         [InlineData("PING", false, null, IrcCommand.PING, null, null, null)]

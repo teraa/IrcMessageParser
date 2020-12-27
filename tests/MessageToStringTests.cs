@@ -3,7 +3,7 @@ using Xunit;
 
 namespace IrcMessageParser.Tests
 {
-    public class ToStringTests
+    public class MessageToStringTests
     {
         [Fact]
         public void ToString1()
