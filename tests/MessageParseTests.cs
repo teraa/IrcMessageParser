@@ -66,24 +66,18 @@ namespace IrcMessageParser.Tests
         }
 
         [Fact]
-        public void TagsParseTest()
+        public void ParseTest_Tags()
         {
-            var raw = @"@+example=raw+:=,escaped\:\s\\;semicolon=\:;space=\s;backslash=\\;cr=\r;lf=\n;random=1\:\s\\\r\n2;flag;trailing=;overwrite=first;overwrite=last NOTICE";
+            var raw = "@key=value :hostmask PRIVMSG #channel :message";
             var msg = IrcMessage.Parse(raw);
 
             Assert.NotNull(msg.Tags);
-            var tags = msg.Tags!;
-            Assert.Equal(10, tags.Count);
-            Assert.Equal(@"raw+:=,escaped; \", tags["+example"]);
-            Assert.Equal(@";", tags["semicolon"]);
-            Assert.Equal(@" ", tags["space"]);
-            Assert.Equal("\\", tags["backslash"]);
-            Assert.Equal("\r", tags["cr"]);
-            Assert.Equal("\n", tags["lf"]);
-            Assert.Equal("1; \\\r\n2", tags["random"]);
-            Assert.Equal("", tags["flag"]);
-            Assert.Equal("", tags["trailing"]);
-            Assert.Equal("last", tags["overwrite"]);
+            Assert.Equal(1, msg.Tags!.Count);
+            Assert.Equal("value", msg.Tags["key"]);
+            Assert.Equal("hostmask", msg.Hostmask);
+            Assert.Equal(IrcCommand.PRIVMSG, msg.Command);
+            Assert.Equal("#channel", msg.Arg);
+            Assert.Equal(new MessageContent("message"), msg.Content);
         }
     }
 }
