@@ -115,7 +115,7 @@ namespace IrcMessageParser
                     if (i == -1)
                     {
                         arg = input.ToString();
-                        input = null;
+                        input = default;
                     }
                     else
                     {
