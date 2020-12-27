@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text;
 
@@ -163,13 +162,13 @@ namespace IrcMessageParser
         }
 
         /// <summary>
-        ///     Parses the tags from <paramref name="input"/> into <see cref="ReadOnlyDictionary{TKey, TValue}"/>.
+        ///     Parses the tags from <paramref name="input"/> into <see cref="Dictionary{TKey, TValue}"/>.
         ///     See <see href="https://ircv3.net/specs/extensions/message-tags#format">IRCv3 spec</see> for details.
         /// </summary>
         /// <param name="input">Tags part of the IRC message.</param>
         /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
         /// <exception cref="ArgumentException"><paramref name="input"/> is empty.</exception>
-        public static ReadOnlyDictionary<string, string> ParseTags(ReadOnlySpan<char> input)
+        public static Dictionary<string, string> ParseTags(ReadOnlySpan<char> input)
         {
             if (input.IsEmpty)
                 throw new ArgumentException("Argument cannot be empty", nameof(input));
@@ -202,7 +201,7 @@ namespace IrcMessageParser
 
             } while (i != -1);
 
-            return new ReadOnlyDictionary<string, string>(tags);
+            return tags;
         }
 
         /// <summary>
