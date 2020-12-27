@@ -39,18 +39,25 @@ jobs:
 
     - name: Pack (Release)
       id: pack-release
-      if: contains(['release', 'workflow_dispatch'], github.event_name)
+      if: >
+        (github.event_name == 'release') ||
+        (github.event_name == 'workflow_dispatch')
       run: dotnet pack --configuration Release --no-build --output nupkgs
 
     - name: Upload Artifacts
-      if: contains([steps.pack-release.outcome, steps.pack-prerelease.outcome], 'success')
+      if: >
+        (steps.pack-release.outcome == 'success') ||
+        (steps.pack-prerelease.outcome == 'success')
       uses: actions/upload-artifact@v2
       with:
         name: nupkgs
         path: nupkgs
 
   publish:
-    if: contains(['push', 'release', 'workflow_dispatch'], github.event_name)
+    if: >
+      (github.event_name == 'push') ||
+      (github.event_name == 'release') ||
+      (github.event_name == 'workflow_dispatch')
     name: Publish
     needs: [ build ]
     runs-on: ubuntu-latest
@@ -73,7 +80,9 @@ jobs:
       run: dotnet nuget push "nupkgs/*.nupkg" --source https://nuget.pkg.github.com/teraa/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
 
     - name: Push (NuGet.org)
-      if: contains(['release', 'workflow_dispatch'], github.event_name)
+      if: >
+        (github.event_name == 'release') ||
+        (github.event_name == 'workflow_dispatch')
       run: dotnet nuget push "nupkgs/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
 
 env:
