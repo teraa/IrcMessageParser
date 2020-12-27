@@ -15,7 +15,6 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/teraa/IrcMessageParser</RepositoryUrl>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>1591</NoWarn>
   </PropertyGroup>
 
 </Project>

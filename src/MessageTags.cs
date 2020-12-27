@@ -6,13 +6,22 @@ using System.Text;
 
 namespace IrcMessageParser
 {
+    /// <summary>
+    ///     Class representing a collection of key/value pairs of <see cref="IrcMessage"/> tags.
+    /// </summary>
     public class MessageTags : IReadOnlyDictionary<string, string>
     {
         private readonly IReadOnlyDictionary<string, string> _tags;
 
+        /// <summary>
+        ///     Initializes a new <see cref="MessageTags"/> instance with the provided <see cref="IReadOnlyDictionary{TKey, TValue}"/>.
+        /// </summary>
+        /// <param name="tags">A <see cref="IReadOnlyDictionary{TKey, TValue}"/> containing tag key/value pairs.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="tags"/> is null.</exception>
         public MessageTags(IReadOnlyDictionary<string, string> tags)
             => _tags = tags ?? throw new ArgumentNullException(nameof(tags));
 
+        /// <inheritdoc/>
         public static implicit operator MessageTags(Dictionary<string, string> tags)
             => new(tags);
 
@@ -21,7 +30,6 @@ namespace IrcMessageParser
         ///     See <see href="https://ircv3.net/specs/extensions/message-tags#format">IRCv3 spec</see> for details.
         /// </summary>
         /// <param name="input">Tags part of the IRC message.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
         /// <exception cref="ArgumentException"><paramref name="input"/> is empty.</exception>
         public static MessageTags Parse(ReadOnlySpan<char> input)
         {
@@ -71,7 +79,6 @@ namespace IrcMessageParser
         /// </summary>
         /// <param name="input">Escaped value of a message tag.</param>
         /// <returns>Parsed value of the message tag.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
         public static string ParseValue(ReadOnlySpan<char> input)
         {
             if (input.IsEmpty) return "";
@@ -111,7 +118,6 @@ namespace IrcMessageParser
         /// </summary>
         /// <param name="input">Parsed value of a message tag.</param>
         /// <returns>Escaped value of the message tag.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
         public static string EscapeValue(ReadOnlySpan<char> input)
         {
             if (input.IsEmpty) return "";
@@ -145,27 +151,35 @@ namespace IrcMessageParser
             return result.ToString();
         }
 
+        /// <inheritdoc/>
         public string this[string key]
             => _tags[key];
 
+        /// <inheritdoc/>
         public IEnumerable<string> Keys
             => _tags.Keys;
 
+        /// <inheritdoc/>
         public IEnumerable<string> Values
             => _tags.Values;
 
+        /// <inheritdoc/>
         public int Count
             => _tags.Count;
 
+        /// <inheritdoc/>
         public bool ContainsKey(string key)
             => _tags.ContainsKey(key);
 
+        /// <inheritdoc/>
         public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
             => _tags.GetEnumerator();
 
+        /// <inheritdoc/>
         public bool TryGetValue(string key, [MaybeNullWhen(false)] out string value)
             => _tags.TryGetValue(key, out value);
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             var result = new StringBuilder();

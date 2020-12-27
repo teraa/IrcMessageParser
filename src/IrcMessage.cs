@@ -4,8 +4,12 @@ using System.Text;
 
 namespace IrcMessageParser
 {
+    /// <summary>
+    ///     IRC message command.
+    /// </summary>
     public enum IrcCommand : ushort
     {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         CAP = 1000,
         CLEARCHAT,
         CLEARMSG,
@@ -25,21 +29,43 @@ namespace IrcMessageParser
         USERNOTICE,
         USERSTATE,
         WHISPER
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     }
 
+    /// <summary>
+    ///     Class representing an IRC message.
+    /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class IrcMessage
     {
+        /// <summary>
+        ///     Message tags.
+        /// </summary>
         public MessageTags? Tags { get; init; }
+        /// <summary>
+        ///     Hostmask.
+        /// </summary>
         public string? Hostmask { get; init; }
+        /// <summary>
+        ///     IRC command.
+        /// </summary>
         public IrcCommand Command { get; init; }
+        /// <summary>
+        ///     Message argument.
+        /// </summary>
         public string? Arg { get; init; }
+        /// <summary>
+        ///     Message content.
+        /// </summary>
         public MessageContent? Content { get; init; }
 
+        /// <summary>
+        ///     Initializes a new <see cref="IrcMessage"/> instance with default values.
+        /// </summary>
         public IrcMessage() { }
 
         /// <summary>
-        ///     Parses the <see cref="IrcMessage"/> from a raw IRC message (<paramref name="input"/>).
+        ///     Parses the <paramref name="input"/> into an instance of <see cref="IrcMessage"/>.
         /// </summary>
         /// <param name="input">Raw IRC message.</param>
         /// <returns><see cref="IrcMessage"/> instance parsed from <paramref name="input"/>.</returns>
@@ -160,6 +186,7 @@ namespace IrcMessageParser
             throw new FormatException($"Invalid command format: {inputStr}");
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             var result = new StringBuilder();
