@@ -148,7 +148,7 @@ namespace IrcMessageParser.Tests
         }
 
         [Fact]
-        public void Command353()
+        public void CommandNumeric()
         {
             var message = IrcMessage.Parse(":hostmask 353 tera = #channel :name1 name2 name3");
 
