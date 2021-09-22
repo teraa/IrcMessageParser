@@ -39,10 +39,10 @@ namespace IrcMessageParser
         /// <returns><see cref="string"/> representing the command.</returns>
         public static string ToString(IrcCommand command)
         {
-            if (command is <= s_maxNumeric)
-                return ((ushort)command).ToString("d3");
+            if (command is > s_maxNumeric)
+                return command.ToString();
 
-            return command.ToString();
+            return ((ushort)command).ToString("d3");
         }
     }
 }
