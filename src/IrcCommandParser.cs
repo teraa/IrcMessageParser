@@ -7,6 +7,8 @@ namespace IrcMessageParser
     /// </summary>
     public static class IrcCommandParser
     {
+        private const IrcCommand s_maxNumeric = (IrcCommand)999;
+
         /// <summary>
         ///     Parses the <see cref="IrcCommand"/> from <paramref name="input"/>.
         ///     See <see href="https://tools.ietf.org/html/rfc1459#section-2.3.1">RFC 1459 Section 2.3.1</see> for details.
@@ -19,14 +21,12 @@ namespace IrcMessageParser
             if (input.Length == 3 && ushort.TryParse(input, out var numeric))
                 return (IrcCommand)numeric;
 
-            const IrcCommand maxNumeric = (IrcCommand)999;
-
 #if NET6_0_OR_GREATER
             if (Enum.TryParse<IrcCommand>(input, true, out var command))
 #else
             if (Enum.TryParse<IrcCommand>(input.ToString(), true, out var command))
 #endif
-                if (command is > maxNumeric && (input[0] is (< '0' or > '9')))
+                if (command is > s_maxNumeric && (input[0] is (< '0' or > '9')))
                     return command;
 
             throw new FormatException($"Invalid command format: {input.ToString()}");
@@ -39,7 +39,7 @@ namespace IrcMessageParser
         /// <returns><see cref="string"/> representing the command.</returns>
         public static string ToString(IrcCommand command)
         {
-            if ((ushort)command is <= 999)
+            if (command is <= s_maxNumeric)
                 return ((ushort)command).ToString("d3");
 
             return command.ToString();
