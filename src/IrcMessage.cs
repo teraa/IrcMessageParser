@@ -5,34 +5,6 @@ using System.Text;
 namespace IrcMessageParser
 {
     /// <summary>
-    ///     IRC message command.
-    /// </summary>
-    public enum IrcCommand : ushort
-    {
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        CAP = 1000,
-        CLEARCHAT,
-        CLEARMSG,
-        GLOBALUSERSTATE,
-        HOSTTARGET,
-        JOIN,
-        MODE,
-        NICK,
-        NOTICE,
-        PART,
-        PASS,
-        PING,
-        PONG,
-        PRIVMSG,
-        RECONNECT,
-        ROOMSTATE,
-        USERNOTICE,
-        USERSTATE,
-        WHISPER
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-    }
-
-    /// <summary>
     ///     Class representing an IRC message.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
@@ -121,7 +93,7 @@ namespace IrcMessageParser
             i = input.IndexOf(' ');
             if (i != -1)
             {
-                command = ParseCommand(input[..i]);
+                command = IrcCommandParser.Parse(input[..i]);
                 input = input[(i + 1)..];
 
                 // No Arg
@@ -154,7 +126,7 @@ namespace IrcMessageParser
             }
             else
             {
-                command = ParseCommand(input);
+                command = IrcCommandParser.Parse(input);
                 arg = null;
                 content = null;
             }
@@ -167,23 +139,6 @@ namespace IrcMessageParser
                 Hostmask = hostmask,
                 Tags = tags
             };
-        }
-
-        /// <summary>
-        ///     Parses the <see cref="IrcCommand"/> from <paramref name="input"/>.
-        ///     See <see href="https://tools.ietf.org/html/rfc1459#section-2.3.1">RFC 1459 Section 2.3.1</see> for details.
-        /// </summary>
-        /// <param name="input">Input to parse.</param>
-        /// <returns><see cref="IrcCommand"/>.</returns>
-        /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
-        public static IrcCommand ParseCommand(ReadOnlySpan<char> input)
-        {
-            var inputStr = input.ToString();
-            if (Enum.TryParse(inputStr, out IrcCommand command)
-                && (Enum.IsDefined(command) || inputStr.Length == 3))
-                return command;
-
-            throw new FormatException($"Invalid command format: {inputStr}");
         }
 
         /// <inheritdoc/>
@@ -203,10 +158,7 @@ namespace IrcMessageParser
                     .Append(Hostmask)
                     .Append(' ');
 
-            if (Enum.IsDefined(Command))
-                result.Append(Enum.GetName(Command));
-            else
-                result.Append(((ushort)Command).ToString("d3"));
+            result.Append(IrcCommandParser.ToString(Command));
 
             if (Arg is not null)
                 result
