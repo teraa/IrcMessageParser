@@ -43,6 +43,7 @@ namespace IrcMessageParser
         /// <param name="input">Content.</param>
         /// <returns><see cref="MessagePrefix"/> instance parsed from <paramref name="input"/>.</returns>
         /// <exception cref="ArgumentException"><paramref name="input"/> is empty.</exception>
+        /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
         public static MessagePrefix Parse(ReadOnlySpan<char> input)
         {
             if (input.IsEmpty)
