@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 
 namespace IrcMessageParser.Tests
@@ -74,6 +75,21 @@ namespace IrcMessageParser.Tests
         {
             var prefix = new MessagePrefix(name: "nick", user: "user", host: "host");
             Assert.Equal("nick!user@host", prefix.ToString());
+        }
+
+        [Theory]
+        [InlineData("nick!@host")]
+        [InlineData("nick!user@")]
+        [InlineData("nick!@")]
+        [InlineData("nick!")]
+        [InlineData("nick@")]
+        [InlineData("!")]
+        [InlineData("@")]
+        public void Parse_ThrowsFormatException(string input)
+        {
+            Assert.Throws<FormatException>(
+                () => MessagePrefix.Parse(input)
+            );
         }
     }
 }

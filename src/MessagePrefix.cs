@@ -55,7 +55,11 @@ namespace IrcMessageParser
 
             if (i != -1)
             {
-                host = input[(i + 1)..].ToString();
+                var hostSpan = input[(i + 1)..];
+                if (hostSpan.IsEmpty)
+                    throw new FormatException("Host part of the prefix is empty.");
+
+                host = hostSpan.ToString();
                 input = input[..i];
             }
             else
@@ -67,13 +71,20 @@ namespace IrcMessageParser
 
             if (i != -1)
             {
-                user = input[(i + 1)..].ToString();
+                var userSpan = input[(i + 1)..];
+                if (userSpan.IsEmpty)
+                    throw new FormatException("User part of the prefix is empty.");
+
+                user = userSpan.ToString();
                 input = input[..i];
             }
             else
             {
                 user = null;
             }
+
+            if (input.IsEmpty)
+                throw new FormatException("Name part of the prefix is empty.");
 
             name = input.ToString();
 
