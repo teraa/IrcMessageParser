@@ -25,9 +25,9 @@ namespace IrcMessageParser
         /// <summary>
         ///     Initializes a new <see cref="MessagePrefix"/> instance with provided values.
         /// </summary>
-        /// <param name="name">.</param>
-        /// <param name="user">.</param>
-        /// <param name="host">.</param>
+        /// <param name="name">Server name or user nick.</param>
+        /// <param name="user">User.</param>
+        /// <param name="host">Host.</param>
         /// <exception cref="ArgumentNullException"><paramref name="name"/> is null.</exception>
         public MessagePrefix(string name, string? user, string? host)
         {
