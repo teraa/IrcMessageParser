@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Text;
 
 namespace IrcMessageParser
@@ -8,7 +7,6 @@ namespace IrcMessageParser
     ///     Class representing an IRC message.
     ///     Message format is defined in <see href="https://datatracker.ietf.org/doc/html/rfc1459#section-2.3.1">RFC 1459 Section 2.3.1</see>.
     /// </summary>
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class IrcMessage
     {
         /// <summary>
@@ -175,7 +173,5 @@ namespace IrcMessageParser
 
             return result.ToString();
         }
-
-        private string DebuggerDisplay => ToString();
     }
 }
