@@ -11,7 +11,7 @@ namespace IrcMessageParser.Tests
             var message = IrcMessage.Parse("PING");
 
             Assert.Null(message.Tags);
-            Assert.Null(message.Hostmask);
+            Assert.Null(message.Prefix);
             Assert.Equal(IrcCommand.PING, message.Command);
             Assert.Null(message.Arg);
             Assert.Null(message.Content);
@@ -23,7 +23,7 @@ namespace IrcMessageParser.Tests
             var message = IrcMessage.Parse("PONG");
 
             Assert.Null(message.Tags);
-            Assert.Null(message.Hostmask);
+            Assert.Null(message.Prefix);
             Assert.Equal(IrcCommand.PONG, message.Command);
             Assert.Null(message.Arg);
             Assert.Null(message.Content);
@@ -41,16 +41,16 @@ namespace IrcMessageParser.Tests
                     Assert.Equal("", tag.Value);
                 }
             );
-            Assert.Null(message.Hostmask);
+            Assert.Null(message.Prefix);
             Assert.Equal(IrcCommand.PING, message.Command);
             Assert.Null(message.Arg);
             Assert.Null(message.Content);
         }
 
         [Fact]
-        public void PingSingleFlagHostmask()
+        public void PingSingleFlagPrefix()
         {
-            var message = IrcMessage.Parse("@tag :hostmask PING");
+            var message = IrcMessage.Parse("@tag :name PING");
 
             Assert.Collection(message.Tags,
                 tag =>
@@ -59,16 +59,19 @@ namespace IrcMessageParser.Tests
                     Assert.Equal("", tag.Value);
                 }
             );
-            Assert.Equal("hostmask", message.Hostmask);
+            Assert.NotNull(message.Prefix);
+            Assert.Equal("name", message.Prefix!.Name);
+            Assert.Null(message.Prefix.User);
+            Assert.Null(message.Prefix.Host);
             Assert.Equal(IrcCommand.PING, message.Command);
             Assert.Null(message.Arg);
             Assert.Null(message.Content);
         }
 
         [Fact]
-        public void PingSingleTagHostmask()
+        public void PingSingleTagPrefix()
         {
-            var message = IrcMessage.Parse("@key=value :hostmask PING");
+            var message = IrcMessage.Parse("@key=value :name PING");
 
             Assert.Collection(message.Tags,
                 tag =>
@@ -77,7 +80,10 @@ namespace IrcMessageParser.Tests
                     Assert.Equal("value", tag.Value);
                 }
             );
-            Assert.Equal("hostmask", message.Hostmask);
+            Assert.NotNull(message.Prefix);
+            Assert.Equal("name", message.Prefix!.Name);
+            Assert.Null(message.Prefix.User);
+            Assert.Null(message.Prefix.Host);
             Assert.Equal(IrcCommand.PING, message.Command);
             Assert.Null(message.Arg);
             Assert.Null(message.Content);
@@ -86,10 +92,13 @@ namespace IrcMessageParser.Tests
         [Fact]
         public void MultiWordArg()
         {
-            var message = IrcMessage.Parse(":hostmask PING arg a");
+            var message = IrcMessage.Parse(":name PING arg a");
 
             Assert.Null(message.Tags);
-            Assert.Equal("hostmask", message.Hostmask);
+            Assert.NotNull(message.Prefix);
+            Assert.Equal("name", message.Prefix!.Name);
+            Assert.Null(message.Prefix.User);
+            Assert.Null(message.Prefix.Host);
             Assert.Equal(IrcCommand.PING, message.Command);
             Assert.Equal("arg a", message.Arg);
             Assert.Null(message.Content);
@@ -98,10 +107,13 @@ namespace IrcMessageParser.Tests
         [Fact]
         public void NoArgContent()
         {
-            var message = IrcMessage.Parse(":hostmask PING :content c");
+            var message = IrcMessage.Parse(":name PING :content c");
 
             Assert.Null(message.Tags);
-            Assert.Equal("hostmask", message.Hostmask);
+            Assert.NotNull(message.Prefix);
+            Assert.Equal("name", message.Prefix!.Name);
+            Assert.Null(message.Prefix.User);
+            Assert.Null(message.Prefix.Host);
             Assert.Equal(IrcCommand.PING, message.Command);
             Assert.Null(message.Arg);
             Assert.NotNull(message.Content);
@@ -111,10 +123,13 @@ namespace IrcMessageParser.Tests
         [Fact]
         public void ArgContent()
         {
-            var message = IrcMessage.Parse(":hostmask PONG arg a :content c");
+            var message = IrcMessage.Parse(":name PONG arg a :content c");
 
             Assert.Null(message.Tags);
-            Assert.Equal("hostmask", message.Hostmask);
+            Assert.NotNull(message.Prefix);
+            Assert.Equal("name", message.Prefix!.Name);
+            Assert.Null(message.Prefix.User);
+            Assert.Null(message.Prefix.Host);
             Assert.Equal(IrcCommand.PONG, message.Command);
             Assert.Equal("arg a", message.Arg);
             Assert.NotNull(message.Content);
@@ -127,7 +142,7 @@ namespace IrcMessageParser.Tests
             var message = IrcMessage.Parse("CAP REQ :cap1 cap2");
 
             Assert.Null(message.Tags);
-            Assert.Null(message.Hostmask);
+            Assert.Null(message.Prefix);
             Assert.Equal(IrcCommand.CAP, message.Command);
             Assert.Equal("REQ", message.Arg);
             Assert.NotNull(message.Content);
@@ -137,10 +152,13 @@ namespace IrcMessageParser.Tests
         [Fact]
         public void CapAck()
         {
-            var message = IrcMessage.Parse(":hostmask CAP * ACK :cap1 cap2");
+            var message = IrcMessage.Parse(":name CAP * ACK :cap1 cap2");
 
             Assert.Null(message.Tags);
-            Assert.Equal("hostmask", message.Hostmask);
+            Assert.NotNull(message.Prefix);
+            Assert.Equal("name", message.Prefix!.Name);
+            Assert.Null(message.Prefix.User);
+            Assert.Null(message.Prefix.Host);
             Assert.Equal(IrcCommand.CAP, message.Command);
             Assert.Equal("* ACK", message.Arg);
             Assert.NotNull(message.Content);
@@ -150,10 +168,13 @@ namespace IrcMessageParser.Tests
         [Fact]
         public void CommandNumeric()
         {
-            var message = IrcMessage.Parse(":hostmask 353 tera = #channel :name1 name2 name3");
+            var message = IrcMessage.Parse(":name 353 tera = #channel :name1 name2 name3");
 
             Assert.Null(message.Tags);
-            Assert.Equal("hostmask", message.Hostmask);
+            Assert.NotNull(message.Prefix);
+            Assert.Equal("name", message.Prefix!.Name);
+            Assert.Null(message.Prefix.User);
+            Assert.Null(message.Prefix.Host);
             Assert.Equal((IrcCommand)353, message.Command);
             Assert.Equal("tera = #channel", message.Arg);
             Assert.NotNull(message.Content);
@@ -166,7 +187,7 @@ namespace IrcMessageParser.Tests
             var message = IrcMessage.Parse("PRIVMSG #channel :\u0001ACTION Text\u0001");
 
             Assert.Null(message.Tags);
-            Assert.Null(message.Hostmask);
+            Assert.Null(message.Prefix);
             Assert.Equal(IrcCommand.PRIVMSG, message.Command);
             Assert.Equal("#channel", message.Arg);
             Assert.NotNull(message.Content);
@@ -180,7 +201,7 @@ namespace IrcMessageParser.Tests
             var message = IrcMessage.Parse("PRIVMSG #channel :\u0001ACTION Text");
 
             Assert.Null(message.Tags);
-            Assert.Null(message.Hostmask);
+            Assert.Null(message.Prefix);
             Assert.Equal(IrcCommand.PRIVMSG, message.Command);
             Assert.Equal("#channel", message.Arg);
             Assert.NotNull(message.Content);
@@ -191,7 +212,7 @@ namespace IrcMessageParser.Tests
         [Fact]
         public void PrivMsgValueTag()
         {
-            var message = IrcMessage.Parse("@key=value :hostmask PRIVMSG #channel :message");
+            var message = IrcMessage.Parse("@key=value :name PRIVMSG #channel :message");
 
             Assert.Collection(message.Tags,
                 tag =>
@@ -200,7 +221,10 @@ namespace IrcMessageParser.Tests
                     Assert.Equal("value", tag.Value);
                 }
             );
-            Assert.Equal("hostmask", message.Hostmask);
+            Assert.NotNull(message.Prefix);
+            Assert.Equal("name", message.Prefix!.Name);
+            Assert.Null(message.Prefix.User);
+            Assert.Null(message.Prefix.Host);
             Assert.Equal(IrcCommand.PRIVMSG, message.Command);
             Assert.Equal("#channel", message.Arg);
             Assert.NotNull(message.Content);

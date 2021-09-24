@@ -17,7 +17,7 @@ namespace IrcMessageParser.Tests
         }
 
         [Fact]
-        public void Tags_Hostmask_Content()
+        public void Tags_Prefix_Content()
         {
             var rawMessage = new IrcMessage
             {
@@ -25,12 +25,12 @@ namespace IrcMessageParser.Tests
                 {
                     ["tag"] = ""
                 },
-                Hostmask = "hostmask",
+                Prefix = new("name", null, null),
                 Command = IrcCommand.PRIVMSG,
                 Content = new("message"),
             }.ToString();
 
-            Assert.Equal("@tag :hostmask PRIVMSG :message", rawMessage);
+            Assert.Equal("@tag :name PRIVMSG :message", rawMessage);
         }
 
         [Fact]
@@ -47,17 +47,17 @@ namespace IrcMessageParser.Tests
         }
 
         [Fact]
-        public void Hostmask_NumericCommand_Arg_Content()
+        public void Prefix_NumericCommand_Arg_Content()
         {
             var rawMessage = new IrcMessage
             {
-                Hostmask = "hostmask",
+                Prefix = new("name", null, null),
                 Command = (IrcCommand)353,
                 Arg = "tera = #channel",
                 Content = new("name1 name2 name3"),
             }.ToString();
 
-            Assert.Equal(":hostmask 353 tera = #channel :name1 name2 name3", rawMessage);
+            Assert.Equal(":name 353 tera = #channel :name1 name2 name3", rawMessage);
         }
 
         [Fact]
@@ -74,17 +74,17 @@ namespace IrcMessageParser.Tests
         }
 
         [Fact]
-        public void Hostmask_Arg_Content()
+        public void Prefix_Arg_Content()
         {
             var rawMessage = new IrcMessage
             {
-                Hostmask = "hostmask",
+                Prefix = new("name", null, null),
                 Command = IrcCommand.CAP,
                 Arg = "* ACK",
                 Content = new("cap1 cap2"),
             }.ToString();
 
-            Assert.Equal(":hostmask CAP * ACK :cap1 cap2", rawMessage);
+            Assert.Equal(":name CAP * ACK :cap1 cap2", rawMessage);
         }
     }
 }

@@ -16,9 +16,9 @@ namespace IrcMessageParser
         /// </summary>
         public MessageTags? Tags { get; init; }
         /// <summary>
-        ///     Hostmask.
+        ///     Message prefix.
         /// </summary>
-        public string? Hostmask { get; init; }
+        public MessagePrefix? Prefix { get; init; }
         /// <summary>
         ///     IRC command.
         /// </summary>
@@ -50,7 +50,7 @@ namespace IrcMessageParser
                 throw new ArgumentException("Argument cannot be empty", nameof(input));
 
             MessageTags? tags;
-            string? hostmask;
+            MessagePrefix? prefix;
             IrcCommand command;
             string? arg;
             MessageContent? content;
@@ -74,21 +74,21 @@ namespace IrcMessageParser
                 tags = null;
             }
 
-            // Hostmask
+            // Prefix
             if (input[0] == ':')
             {
                 input = input[1..];
                 i = input.IndexOf(' ');
 
                 if (i == -1)
-                    throw new FormatException("Missing hostmask ending");
+                    throw new FormatException("Missing prefix ending");
 
-                hostmask = input[..i].ToString();
+                prefix = MessagePrefix.Parse(input[..i]);
                 input = input[(i + 1)..];
             }
             else
             {
-                hostmask = null;
+                prefix = null;
             }
 
             // Command
@@ -138,7 +138,7 @@ namespace IrcMessageParser
                 Arg = arg,
                 Command = command,
                 Content = content,
-                Hostmask = hostmask,
+                Prefix = prefix,
                 Tags = tags
             };
         }
@@ -154,10 +154,10 @@ namespace IrcMessageParser
                     .Append(Tags)
                     .Append(' ');
 
-            if (Hostmask is not null)
+            if (Prefix is not null)
                 result
                     .Append(':')
-                    .Append(Hostmask)
+                    .Append(Prefix)
                     .Append(' ');
 
             result.Append(IrcCommandParser.ToString(Command));
