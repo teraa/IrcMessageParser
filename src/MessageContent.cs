@@ -34,10 +34,9 @@ namespace IrcMessageParser
         /// <inheritdoc/>
         public static implicit operator string(MessageContent content)
         {
-            if (content.Ctcp is null)
-                return content.Text;
-
-            return $"{CtcpDelimiter}{content.Ctcp} {content.Text}{CtcpDelimiter}";
+            return content.Ctcp is null
+                ? content.Text
+                : $"{CtcpDelimiter}{content.Ctcp} {content.Text}{CtcpDelimiter}";
         }
 
         /// <inheritdoc/>
