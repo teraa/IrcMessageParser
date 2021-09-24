@@ -212,7 +212,7 @@ namespace IrcMessageParser.Tests
         [Fact]
         public void PrivMsgValueTag()
         {
-            var message = IrcMessage.Parse("@key=value :name PRIVMSG #channel :message");
+            var message = IrcMessage.Parse("@key=value :nick!user@host PRIVMSG #channel :message");
 
             Assert.Collection(message.Tags,
                 tag =>
@@ -222,9 +222,9 @@ namespace IrcMessageParser.Tests
                 }
             );
             Assert.NotNull(message.Prefix);
-            Assert.Equal("name", message.Prefix!.Name);
-            Assert.Null(message.Prefix.User);
-            Assert.Null(message.Prefix.Host);
+            Assert.Equal("nick", message.Prefix!.Name);
+            Assert.Equal("user", message.Prefix.User);
+            Assert.Equal("host", message.Prefix.Host);
             Assert.Equal(IrcCommand.PRIVMSG, message.Command);
             Assert.Equal("#channel", message.Arg);
             Assert.NotNull(message.Content);
