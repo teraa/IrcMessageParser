@@ -11,7 +11,7 @@ namespace IrcMessageParser
 
         /// <summary>
         ///     Parses the <see cref="IrcCommand"/> from <paramref name="input"/>.
-        ///     See <see href="https://tools.ietf.org/html/rfc1459#section-2.3.1">RFC 1459 Section 2.3.1</see> for details.
+        ///     See <see href="https://datatracker.ietf.org/doc/html/rfc1459#section-2.3.1">RFC 1459 Section 2.3.1</see> for details.
         /// </summary>
         /// <param name="input">Input to parse.</param>
         /// <returns><see cref="IrcCommand"/>.</returns>

@@ -6,6 +6,7 @@ namespace IrcMessageParser
 {
     /// <summary>
     ///     Class representing an IRC message.
+    ///     Message format is defined in <see href="https://datatracker.ietf.org/doc/html/rfc1459#section-2.3.1">RFC 1459 Section 2.3.1</see>.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class IrcMessage
@@ -42,6 +43,7 @@ namespace IrcMessageParser
         /// <param name="input">Raw IRC message.</param>
         /// <returns><see cref="IrcMessage"/> instance parsed from <paramref name="input"/>.</returns>
         /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
+        /// <exception cref="ArgumentException"><paramref name="input"/> is empty.</exception>
         public static IrcMessage Parse(ReadOnlySpan<char> input)
         {
             if (input.IsEmpty)
