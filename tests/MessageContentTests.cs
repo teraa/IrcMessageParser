@@ -6,7 +6,7 @@ namespace IrcMessageParser.Tests
     public class MessageContentTests
     {
         [Fact]
-        public void NoCtcp()
+        public void NoCtcp_Parse()
         {
             var raw = "text";
             var content = MessageContent.Parse(raw);
@@ -17,7 +17,7 @@ namespace IrcMessageParser.Tests
         }
 
         [Fact]
-        public void Ctcp()
+        public void Ctcp_Parse()
         {
             var raw = "\u0001ACTION text\u0001";
             var content = MessageContent.Parse(raw);
@@ -28,7 +28,7 @@ namespace IrcMessageParser.Tests
         }
 
         [Fact]
-        public void CtcpMissingEndDelimiter()
+        public void CtcpMissingEndDelimiter_Parse()
         {
             var raw = "\u0001ACTION text";
             var content = MessageContent.Parse(raw);
@@ -39,9 +39,25 @@ namespace IrcMessageParser.Tests
         }
 
         [Fact]
-        public void CtcpMissingEnding_Throws()
+        public void CtcpMissingEnding_ParseThrows()
         {
-            Assert.Throws<FormatException>(() => MessageContent.Parse("\u0001ACTION"));
+            Assert.Throws<FormatException>(
+                () => MessageContent.Parse("\u0001ACTION")
+            );
+        }
+
+        [Fact]
+        public void NoCtcp_ToString()
+        {
+            var content = new MessageContent("text");
+            Assert.Equal("text", content.ToString());
+        }
+
+        [Fact]
+        public void Ctcp_ToString()
+        {
+            var content = new MessageContent("text", "ACTION");
+            Assert.Equal("\u0001ACTION text\u0001", content.ToString());
         }
     }
 }
