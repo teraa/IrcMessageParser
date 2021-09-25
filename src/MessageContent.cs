@@ -8,7 +8,7 @@ namespace IrcMessageParser
     /// </summary>
     public record MessageContent
     {
-        private const char CtcpDelimiter = '\u0001';
+        private const char s_ctcpDelimiter = '\u0001';
 
         /// <summary>
         ///     Content text.
@@ -36,7 +36,7 @@ namespace IrcMessageParser
         {
             return content.Ctcp is null
                 ? content.Text
-                : $"{CtcpDelimiter}{content.Ctcp} {content.Text}{CtcpDelimiter}";
+                : $"{s_ctcpDelimiter}{content.Ctcp} {content.Text}{s_ctcpDelimiter}";
         }
 
         /// <inheritdoc/>
@@ -53,10 +53,10 @@ namespace IrcMessageParser
         public static MessageContent Parse(ReadOnlySpan<char> input)
         {
             string? ctcp;
-            if (input[0] == CtcpDelimiter)
+            if (input[0] == s_ctcpDelimiter)
             {
                 input = input[1..];
-                if (input[^1] == CtcpDelimiter)
+                if (input[^1] == s_ctcpDelimiter)
                     input = input[..^1];
 
                 int i = input.IndexOf(' ');
