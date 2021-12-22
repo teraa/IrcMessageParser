@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <AssemblyName>Teraa.IrcMessageParser</AssemblyName>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>IrcMessageParser</RootNamespace>
     <Nullable>enable</Nullable>
     <PackageId>Teraa.IrcMessageParser</PackageId>
