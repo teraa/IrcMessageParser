@@ -21,8 +21,9 @@ public static class CommandParser
         if (input.Length == 3 && ushort.TryParse(input, out var numeric))
             return (Command)numeric;
 
-        if (Enum.TryParse<Command>(input, true, out var command))
-            if (command is > s_maxNumeric && (input[0] is (< '0' or > '9')))
+        if (Enum.TryParse<Command>(input, true, out var command)
+            && command is > s_maxNumeric
+            && (input[0] is (< '0' or > '9')))
                 return command;
 
         throw new FormatException($"Invalid command format: {input.ToString()}");
