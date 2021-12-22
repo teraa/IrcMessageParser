@@ -21,11 +21,7 @@ public static class IrcCommandParser
         if (input.Length == 3 && ushort.TryParse(input, out var numeric))
             return (IrcCommand)numeric;
 
-#if NET6_0_OR_GREATER
         if (Enum.TryParse<IrcCommand>(input, true, out var command))
-#else
-        if (Enum.TryParse<IrcCommand>(input.ToString(), true, out var command))
-#endif
             if (command is > s_maxNumeric && (input[0] is (< '0' or > '9')))
                 return command;
 
