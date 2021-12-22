@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Xunit;
 
-namespace Teraa.IrcMessageParser.Tests;
+namespace Teraa.Irc.Tests;
 
 public class MessageToStringTests
 {

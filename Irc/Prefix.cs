@@ -1,6 +1,6 @@
 using System;
 
-namespace Teraa.IrcMessageParser;
+namespace Teraa.Irc;
 
 /// <summary>
 ///     Record representing message prefix of a <see cref="Message"/>.

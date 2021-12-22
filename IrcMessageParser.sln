@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IrcMessageParser", "IrcMessageParser\IrcMessageParser.csproj", "{AB7BBFBB-2936-49E3-B31D-46F68BE59393}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Irc", "Irc\Irc.csproj", "{AB7BBFBB-2936-49E3-B31D-46F68BE59393}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IrcMessageParser.Tests", "IrcMessageParser.Tests\IrcMessageParser.Tests.csproj", "{BA83B575-CAB7-4534-8654-C3DD6B65A74A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Irc.Tests", "Irc.Tests\Irc.Tests.csproj", "{BA83B575-CAB7-4534-8654-C3DD6B65A74A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A5C67631-CF67-43F2-A097-573CAC2B1664}"
 	ProjectSection(SolutionItems) = preProject

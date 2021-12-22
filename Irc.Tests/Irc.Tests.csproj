@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <RootNamespace>Teraa.IrcMessageParser.Tests</RootNamespace>
+    <RootNamespace>Teraa.Irc.Tests</RootNamespace>
     <Nullable>enable</Nullable>
 
     <IsPackable>false</IsPackable>
@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\IrcMessageParser\IrcMessageParser.csproj" />
+    <ProjectReference Include="..\Irc\Irc.csproj" />
   </ItemGroup>
 
 </Project>
