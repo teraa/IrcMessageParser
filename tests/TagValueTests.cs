@@ -1,7 +1,7 @@
 using Xunit;
 
-namespace IrcMessageParser.Tests
-{
+namespace IrcMessageParser.Tests;
+
     public class TagValueTests
     {
         [Theory]
@@ -33,4 +33,3 @@ namespace IrcMessageParser.Tests
             Assert.Equal(parsed, actualParsed);
         }
     }
-}

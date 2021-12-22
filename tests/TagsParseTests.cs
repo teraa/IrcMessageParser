@@ -1,7 +1,7 @@
 using Xunit;
 
-namespace IrcMessageParser.Tests
-{
+namespace IrcMessageParser.Tests;
+
     public class TagsParseTests
     {
         [Fact]
@@ -136,4 +136,3 @@ namespace IrcMessageParser.Tests
             );
         }
     }
-}

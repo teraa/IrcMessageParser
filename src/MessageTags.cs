@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-namespace IrcMessageParser
-{
+namespace IrcMessageParser;
+
     /// <summary>
     ///     Class representing a collection of key/value pairs of <see cref="IrcMessage"/> tags.
     /// </summary>
@@ -208,4 +208,3 @@ namespace IrcMessageParser
         IEnumerator IEnumerable.GetEnumerator()
             => _tags.GetEnumerator();
     }
-}

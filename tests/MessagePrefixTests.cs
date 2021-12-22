@@ -1,8 +1,8 @@
 using System;
 using Xunit;
 
-namespace IrcMessageParser.Tests
-{
+namespace IrcMessageParser.Tests;
+
     public class MessagePrefixTests
     {
         [Fact]
@@ -92,4 +92,3 @@ namespace IrcMessageParser.Tests
             );
         }
     }
-}

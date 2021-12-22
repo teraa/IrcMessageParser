@@ -1,7 +1,7 @@
 using System;
 
-namespace IrcMessageParser
-{
+namespace IrcMessageParser;
+
     /// <summary>
     ///     Record representing content of a <see cref="IrcMessage"/>.
     ///     See <see href="https://tools.ietf.org/id/draft-oakley-irc-ctcp-01.html"/> for details.
@@ -80,4 +80,3 @@ namespace IrcMessageParser
         /// <inheritdoc/>
         public override string ToString() => this;
     }
-}

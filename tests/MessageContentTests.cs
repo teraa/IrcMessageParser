@@ -1,8 +1,8 @@
 using System;
 using Xunit;
 
-namespace IrcMessageParser.Tests
-{
+namespace IrcMessageParser.Tests;
+
     public class MessageContentTests
     {
         [Fact]
@@ -60,4 +60,3 @@ namespace IrcMessageParser.Tests
             Assert.Equal("\u0001ACTION text\u0001", content.ToString());
         }
     }
-}

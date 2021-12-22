@@ -1,8 +1,8 @@
 using System;
 using Xunit;
 
-namespace IrcMessageParser.Tests
-{
+namespace IrcMessageParser.Tests;
+
     public class IrcCommandParserTests
     {
         [Theory]
@@ -54,4 +54,3 @@ namespace IrcMessageParser.Tests
             Assert.Equal(expected, actual);
         }
     }
-}

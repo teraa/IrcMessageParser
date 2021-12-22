@@ -1,7 +1,7 @@
 using System;
 
-namespace IrcMessageParser
-{
+namespace IrcMessageParser;
+
     /// <summary>
     ///     Record representing message prefix of a <see cref="IrcMessage"/>.
     ///     Prefix contains information about the server or user sending the message.
@@ -104,4 +104,3 @@ namespace IrcMessageParser
             };
         }
     }
-}

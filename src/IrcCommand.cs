@@ -1,5 +1,5 @@
-namespace IrcMessageParser
-{
+namespace IrcMessageParser;
+
     /// <summary>
     ///     IRC message command.
     /// </summary>
@@ -193,4 +193,3 @@ namespace IrcMessageParser
         WHOWAS,
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     }
-}

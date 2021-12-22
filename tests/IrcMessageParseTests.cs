@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Xunit;
 
-namespace IrcMessageParser.Tests
-{
+namespace IrcMessageParser.Tests;
+
     public class IrcMessageParseTests
     {
         [Fact]
@@ -231,4 +231,3 @@ namespace IrcMessageParser.Tests
             Assert.Equal("message", message.Content!);
         }
     }
-}

@@ -1,7 +1,7 @@
 using System;
 
-namespace IrcMessageParser
-{
+namespace IrcMessageParser;
+
     /// <summary>
     ///     Class for parsing <see cref="IrcCommand"/> values.
     /// </summary>
@@ -45,4 +45,3 @@ namespace IrcMessageParser
             return ((ushort)command).ToString("d3");
         }
     }
-}

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Xunit;
 
-namespace IrcMessageParser.Tests
-{
+namespace IrcMessageParser.Tests;
+
     public class IrcMessageToStringTests
     {
         [Fact]
@@ -87,4 +87,3 @@ namespace IrcMessageParser.Tests
             Assert.Equal(":name CAP * ACK :cap1 cap2", rawMessage);
         }
     }
-}
