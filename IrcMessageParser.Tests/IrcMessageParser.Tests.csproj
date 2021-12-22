@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\IrcMessageParser.csproj" />
+    <ProjectReference Include="..\IrcMessageParser\IrcMessageParser.csproj" />
   </ItemGroup>
 
 </Project>
