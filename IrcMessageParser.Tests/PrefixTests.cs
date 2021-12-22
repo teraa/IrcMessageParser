@@ -3,13 +3,13 @@ using Xunit;
 
 namespace Teraa.IrcMessageParser.Tests;
 
-public class MessagePrefixTests
+public class PrefixTests
 {
     [Fact]
     public void NameOnly_Parse()
     {
         var raw = "servername";
-        var prefix = MessagePrefix.Parse(raw);
+        var prefix = Prefix.Parse(raw);
 
         Assert.Equal(raw, prefix.Name);
         Assert.Null(prefix.User);
@@ -20,7 +20,7 @@ public class MessagePrefixTests
     public void NickAndUser_Parse()
     {
         var raw = "nick!user";
-        var prefix = MessagePrefix.Parse(raw);
+        var prefix = Prefix.Parse(raw);
 
         Assert.Equal("nick", prefix.Name);
         Assert.Equal("user", prefix.User);
@@ -31,7 +31,7 @@ public class MessagePrefixTests
     public void NickAndHost_Parse()
     {
         var raw = "nick@host";
-        var prefix = MessagePrefix.Parse(raw);
+        var prefix = Prefix.Parse(raw);
 
         Assert.Equal("nick", prefix.Name);
         Assert.Null(prefix.User);
@@ -42,7 +42,7 @@ public class MessagePrefixTests
     public void Full_Parse()
     {
         var raw = "nick!user@host";
-        var prefix = MessagePrefix.Parse(raw);
+        var prefix = Prefix.Parse(raw);
 
         Assert.Equal("nick", prefix.Name);
         Assert.Equal("user", prefix.User);
@@ -52,28 +52,28 @@ public class MessagePrefixTests
     [Fact]
     public void NameOnly_ToString()
     {
-        var prefix = new MessagePrefix(name: "servername", user: null, host: null);
+        var prefix = new Prefix(name: "servername", user: null, host: null);
         Assert.Equal("servername", prefix.ToString());
     }
 
     [Fact]
     public void NickAndUser_ToString()
     {
-        var prefix = new MessagePrefix(name: "nick", user: "user", host: null);
+        var prefix = new Prefix(name: "nick", user: "user", host: null);
         Assert.Equal("nick!user", prefix.ToString());
     }
 
     [Fact]
     public void NickAndHost_ToString()
     {
-        var prefix = new MessagePrefix(name: "nick", user: null, host: "host");
+        var prefix = new Prefix(name: "nick", user: null, host: "host");
         Assert.Equal("nick@host", prefix.ToString());
     }
 
     [Fact]
     public void Full_ToString()
     {
-        var prefix = new MessagePrefix(name: "nick", user: "user", host: "host");
+        var prefix = new Prefix(name: "nick", user: "user", host: "host");
         Assert.Equal("nick!user@host", prefix.ToString());
     }
 
@@ -88,7 +88,7 @@ public class MessagePrefixTests
     public void Parse_ThrowsFormatException(string input)
     {
         Assert.Throws<FormatException>(
-            () => MessagePrefix.Parse(input)
+            () => Prefix.Parse(input)
         );
     }
 }

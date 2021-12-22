@@ -3,10 +3,10 @@ using System;
 namespace Teraa.IrcMessageParser;
 
 /// <summary>
-///     Record representing content of a <see cref="IrcMessage"/>.
+///     Record representing content of a <see cref="Message"/>.
 ///     See <see href="https://tools.ietf.org/id/draft-oakley-irc-ctcp-01.html"/> for details.
 /// </summary>
-public record MessageContent
+public record Content
 {
     private const char s_ctcpDelimiter = '\u0001';
 
@@ -20,19 +20,19 @@ public record MessageContent
     public string? Ctcp { get; }
 
     /// <summary>
-    ///     Initializes a new <see cref="MessageContent"/> instance with provided values.
+    ///     Initializes a new <see cref="Content"/> instance with provided values.
     /// </summary>
     /// <param name="text">Content text.</param>
     /// <param name="ctcp">Client-to-Client Protocol command.</param>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is null.</exception>
-    public MessageContent(string text, string? ctcp = null)
+    public Content(string text, string? ctcp = null)
     {
         Text = text ?? throw new ArgumentNullException(nameof(text));
         Ctcp = ctcp;
     }
 
     /// <inheritdoc/>
-    public static implicit operator string(MessageContent content)
+    public static implicit operator string(Content content)
     {
         return content.Ctcp is null
             ? content.Text
@@ -40,17 +40,17 @@ public record MessageContent
     }
 
     /// <inheritdoc/>
-    public static explicit operator MessageContent(string s)
+    public static explicit operator Content(string s)
         => Parse(s);
 
     /// <summary>
-    ///     Parses the <paramref name="input"/> into an instance of <see cref="MessageContent"/>.
+    ///     Parses the <paramref name="input"/> into an instance of <see cref="Content"/>.
     ///     See <see href="https://tools.ietf.org/id/draft-oakley-irc-ctcp-01.html"/> for details.
     /// </summary>
     /// <param name="input">Content.</param>
-    /// <returns><see cref="MessageContent"/> instance parsed from <paramref name="input"/>.</returns>
+    /// <returns><see cref="Content"/> instance parsed from <paramref name="input"/>.</returns>
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
-    public static MessageContent Parse(ReadOnlySpan<char> input)
+    public static Content Parse(ReadOnlySpan<char> input)
     {
         string? ctcp;
         if (input[0] == s_ctcpDelimiter)
@@ -74,7 +74,7 @@ public record MessageContent
 
         var text = input.ToString();
 
-        return new MessageContent(text, ctcp);
+        return new Content(text, ctcp);
     }
 
     /// <inheritdoc/>

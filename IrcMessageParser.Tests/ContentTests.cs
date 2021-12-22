@@ -3,13 +3,13 @@ using Xunit;
 
 namespace Teraa.IrcMessageParser.Tests;
 
-public class MessageContentTests
+public class ContentTests
 {
     [Fact]
     public void NoCtcp_Parse()
     {
         var raw = "text";
-        var content = MessageContent.Parse(raw);
+        var content = Content.Parse(raw);
 
         Assert.Equal(raw, content.Text);
         Assert.Null(content.Ctcp);
@@ -20,7 +20,7 @@ public class MessageContentTests
     public void Ctcp_Parse()
     {
         var raw = "\u0001ACTION text\u0001";
-        var content = MessageContent.Parse(raw);
+        var content = Content.Parse(raw);
 
         Assert.Equal("text", content.Text);
         Assert.Equal("ACTION", content.Ctcp);
@@ -31,7 +31,7 @@ public class MessageContentTests
     public void CtcpMissingEndDelimiter_Parse()
     {
         var raw = "\u0001ACTION text";
-        var content = MessageContent.Parse(raw);
+        var content = Content.Parse(raw);
 
         Assert.Equal("text", content.Text);
         Assert.Equal("ACTION", content.Ctcp);
@@ -42,21 +42,21 @@ public class MessageContentTests
     public void CtcpMissingEnding_ParseThrows()
     {
         Assert.Throws<FormatException>(
-            () => MessageContent.Parse("\u0001ACTION")
+            () => Content.Parse("\u0001ACTION")
         );
     }
 
     [Fact]
     public void NoCtcp_ToString()
     {
-        var content = new MessageContent("text");
+        var content = new Content("text");
         Assert.Equal("text", content.ToString());
     }
 
     [Fact]
     public void Ctcp_ToString()
     {
-        var content = new MessageContent("text", "ACTION");
+        var content = new Content("text", "ACTION");
         Assert.Equal("\u0001ACTION text\u0001", content.ToString());
     }
 }

@@ -7,22 +7,22 @@ using System.Text;
 namespace Teraa.IrcMessageParser;
 
 /// <summary>
-///     Class representing a collection of key/value pairs of <see cref="IrcMessage"/> tags.
+///     Class representing a collection of key/value pairs of <see cref="Message"/> tags.
 /// </summary>
-public class MessageTags : IReadOnlyDictionary<string, string>
+public class Tags : IReadOnlyDictionary<string, string>
 {
     private readonly IReadOnlyDictionary<string, string> _tags;
 
     /// <summary>
-    ///     Initializes a new <see cref="MessageTags"/> instance with the provided <see cref="IReadOnlyDictionary{TKey, TValue}"/>.
+    ///     Initializes a new <see cref="Tags"/> instance with the provided <see cref="IReadOnlyDictionary{TKey, TValue}"/>.
     /// </summary>
     /// <param name="tags">A <see cref="IReadOnlyDictionary{TKey, TValue}"/> containing tag key/value pairs.</param>
     /// <exception cref="ArgumentNullException"><paramref name="tags"/> is null.</exception>
-    public MessageTags(IReadOnlyDictionary<string, string> tags)
+    public Tags(IReadOnlyDictionary<string, string> tags)
         => _tags = tags ?? throw new ArgumentNullException(nameof(tags));
 
     /// <inheritdoc/>
-    public static implicit operator MessageTags(Dictionary<string, string> tags)
+    public static implicit operator Tags(Dictionary<string, string> tags)
         => new(tags);
 
     /// <summary>
@@ -31,7 +31,7 @@ public class MessageTags : IReadOnlyDictionary<string, string>
     /// </summary>
     /// <param name="input">Tags part of the IRC message.</param>
     /// <exception cref="ArgumentException"><paramref name="input"/> is empty.</exception>
-    public static MessageTags Parse(ReadOnlySpan<char> input)
+    public static Tags Parse(ReadOnlySpan<char> input)
     {
         if (input.IsEmpty)
             throw new ArgumentException("Argument cannot be empty", nameof(input));

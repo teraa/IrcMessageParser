@@ -7,7 +7,7 @@ public class TagsParseTests
     [Fact]
     public void MultipleTags()
     {
-        var tags = MessageTags.Parse("A;B=;C=c\\;D=d;");
+        var tags = Tags.Parse("A;B=;C=c\\;D=d;");
 
         Assert.Collection(tags,
             tag =>
@@ -36,7 +36,7 @@ public class TagsParseTests
     [Fact]
     public void EqualsSignInValue_TreatedAsValue()
     {
-        var tags = MessageTags.Parse("key=value=value;");
+        var tags = Tags.Parse("key=value=value;");
 
         Assert.Collection(tags,
             pair =>
@@ -50,7 +50,7 @@ public class TagsParseTests
     [Fact]
     public void TagWithPrefixPlus()
     {
-        var tags = MessageTags.Parse("+key=value");
+        var tags = Tags.Parse("+key=value");
 
         Assert.Collection(tags,
             pair =>
@@ -64,7 +64,7 @@ public class TagsParseTests
     [Fact]
     public void TrailingSemicolon_Ignored()
     {
-        var tags = MessageTags.Parse("key=value;");
+        var tags = Tags.Parse("key=value;");
 
         Assert.Collection(tags,
             pair =>
@@ -78,7 +78,7 @@ public class TagsParseTests
     [Fact]
     public void Flag_EmptyValue()
     {
-        var tags = MessageTags.Parse("A");
+        var tags = Tags.Parse("A");
 
         Assert.Collection(tags,
             pair =>
@@ -92,7 +92,7 @@ public class TagsParseTests
     [Fact]
     public void FlagWithTrailing_EmptyValue()
     {
-        var tags = MessageTags.Parse("A=");
+        var tags = Tags.Parse("A=");
 
         Assert.Collection(tags,
             pair =>
@@ -106,7 +106,7 @@ public class TagsParseTests
     [Fact]
     public void RepeatedKey_OverwritesValue()
     {
-        var tags = MessageTags.Parse("A=a1;B=b;A=a2");
+        var tags = Tags.Parse("A=a1;B=b;A=a2");
 
         Assert.Collection(tags,
             tag =>
@@ -125,7 +125,7 @@ public class TagsParseTests
     [Fact]
     public void RepeatedFlagKey_OverwritesValue()
     {
-        var tags = MessageTags.Parse("A=a;A");
+        var tags = Tags.Parse("A=a;A");
 
         Assert.Collection(tags,
             tag =>

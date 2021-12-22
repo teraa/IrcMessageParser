@@ -3,14 +3,14 @@ using Xunit;
 
 namespace Teraa.IrcMessageParser.Tests;
 
-public class IrcMessageToStringTests
+public class MessageToStringTests
 {
     [Fact]
     public void CommandOnly()
     {
-        var rawMessage = new IrcMessage
+        var rawMessage = new Message
         {
-            Command = IrcCommand.PING,
+            Command = Command.PING,
         }.ToString();
 
         Assert.Equal("PING", rawMessage);
@@ -19,14 +19,14 @@ public class IrcMessageToStringTests
     [Fact]
     public void Tags_Prefix_Content()
     {
-        var rawMessage = new IrcMessage
+        var rawMessage = new Message
         {
             Tags = new Dictionary<string, string>
             {
                 ["tag"] = ""
             },
             Prefix = new("name", null, null),
-            Command = IrcCommand.PRIVMSG,
+            Command = Command.PRIVMSG,
             Content = new("message"),
         }.ToString();
 
@@ -36,9 +36,9 @@ public class IrcMessageToStringTests
     [Fact]
     public void Arg_Content()
     {
-        var rawMessage = new IrcMessage
+        var rawMessage = new Message
         {
-            Command = IrcCommand.CAP,
+            Command = Command.CAP,
             Arg = "REQ",
             Content = new("cap1 cap2"),
         }.ToString();
@@ -49,10 +49,10 @@ public class IrcMessageToStringTests
     [Fact]
     public void Prefix_NumericCommand_Arg_Content()
     {
-        var rawMessage = new IrcMessage
+        var rawMessage = new Message
         {
             Prefix = new("name", null, null),
-            Command = (IrcCommand)353,
+            Command = (Command)353,
             Arg = "tera = #channel",
             Content = new("name1 name2 name3"),
         }.ToString();
@@ -63,9 +63,9 @@ public class IrcMessageToStringTests
     [Fact]
     public void Arg_CtcpContent()
     {
-        var rawMessage = new IrcMessage
+        var rawMessage = new Message
         {
-            Command = IrcCommand.PRIVMSG,
+            Command = Command.PRIVMSG,
             Arg = "#channel",
             Content = new("hi", "ACTION"),
         }.ToString();
@@ -76,10 +76,10 @@ public class IrcMessageToStringTests
     [Fact]
     public void Prefix_Arg_Content()
     {
-        var rawMessage = new IrcMessage
+        var rawMessage = new Message
         {
             Prefix = new("name", null, null),
-            Command = IrcCommand.CAP,
+            Command = Command.CAP,
             Arg = "* ACK",
             Content = new("cap1 cap2"),
         }.ToString();

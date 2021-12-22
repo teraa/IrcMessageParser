@@ -13,7 +13,7 @@ public class TagValueTests
     [InlineData(@"\\ ", @"\\\\\s")]
     public void EscapeValueTest(string input, string escaped)
     {
-        var actualEscaped = MessageTags.EscapeValue(input);
+        var actualEscaped = Tags.EscapeValue(input);
         Assert.Equal(escaped, actualEscaped);
     }
 
@@ -29,7 +29,7 @@ public class TagValueTests
     [InlineData(@"\\s", @"\s")]
     public void ParseValueTest(string input, string parsed)
     {
-        var actualParsed = MessageTags.ParseValue(input);
+        var actualParsed = Tags.ParseValue(input);
         Assert.Equal(parsed, actualParsed);
     }
 }

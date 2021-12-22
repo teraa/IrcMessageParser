@@ -3,11 +3,11 @@ using System;
 namespace Teraa.IrcMessageParser;
 
 /// <summary>
-///     Record representing message prefix of a <see cref="IrcMessage"/>.
+///     Record representing message prefix of a <see cref="Message"/>.
 ///     Prefix contains information about the server or user sending the message.
 ///     See <see href="https://datatracker.ietf.org/doc/html/rfc1459#section-2.3.1">RFC 1459 Section 2.3.1</see> for details.
 /// </summary>
-public record MessagePrefix
+public record Prefix
 {
     /// <summary>
     ///     Server name or user nick.
@@ -23,13 +23,13 @@ public record MessagePrefix
     public string? Host { get; }
 
     /// <summary>
-    ///     Initializes a new <see cref="MessagePrefix"/> instance with provided values.
+    ///     Initializes a new <see cref="Prefix"/> instance with provided values.
     /// </summary>
     /// <param name="name">Server name or user nick.</param>
     /// <param name="user">User.</param>
     /// <param name="host">Host.</param>
     /// <exception cref="ArgumentNullException"><paramref name="name"/> is null.</exception>
-    public MessagePrefix(string name, string? user, string? host)
+    public Prefix(string name, string? user, string? host)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));
         User = user;
@@ -37,14 +37,14 @@ public record MessagePrefix
     }
 
     /// <summary>
-    ///     Parses the <paramref name="input"/> into an instance of <see cref="MessagePrefix"/>.
+    ///     Parses the <paramref name="input"/> into an instance of <see cref="Prefix"/>.
     ///     See <see href="https://datatracker.ietf.org/doc/html/rfc1459#section-2.3.1">RFC 1459 Section 2.3.1</see> for details.
     /// </summary>
     /// <param name="input">Content.</param>
-    /// <returns><see cref="MessagePrefix"/> instance parsed from <paramref name="input"/>.</returns>
+    /// <returns><see cref="Prefix"/> instance parsed from <paramref name="input"/>.</returns>
     /// <exception cref="ArgumentException"><paramref name="input"/> is empty.</exception>
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
-    public static MessagePrefix Parse(ReadOnlySpan<char> input)
+    public static Prefix Parse(ReadOnlySpan<char> input)
     {
         if (input.IsEmpty)
             throw new ArgumentException("Argument cannot be empty", nameof(input));
@@ -89,7 +89,7 @@ public record MessagePrefix
 
         name = input.ToString();
 
-        return new MessagePrefix(name, user, host);
+        return new Prefix(name, user, host);
     }
 
     /// <inheritdoc/>

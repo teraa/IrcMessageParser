@@ -7,20 +7,20 @@ namespace Teraa.IrcMessageParser;
 ///     Class representing an IRC message.
 ///     Message format is defined in <see href="https://datatracker.ietf.org/doc/html/rfc1459#section-2.3.1">RFC 1459 Section 2.3.1</see>.
 /// </summary>
-public class IrcMessage
+public class Message
 {
     /// <summary>
     ///     Message tags.
     /// </summary>
-    public MessageTags? Tags { get; init; }
+    public Tags? Tags { get; init; }
     /// <summary>
     ///     Message prefix.
     /// </summary>
-    public MessagePrefix? Prefix { get; init; }
+    public Prefix? Prefix { get; init; }
     /// <summary>
     ///     IRC command.
     /// </summary>
-    public IrcCommand Command { get; init; }
+    public Command Command { get; init; }
     /// <summary>
     ///     Message argument.
     /// </summary>
@@ -28,30 +28,30 @@ public class IrcMessage
     /// <summary>
     ///     Message content.
     /// </summary>
-    public MessageContent? Content { get; init; }
+    public Content? Content { get; init; }
 
     /// <summary>
-    ///     Initializes a new <see cref="IrcMessage"/> instance with default values.
+    ///     Initializes a new <see cref="Message"/> instance with default values.
     /// </summary>
-    public IrcMessage() { }
+    public Message() { }
 
     /// <summary>
-    ///     Parses the <paramref name="input"/> into an instance of <see cref="IrcMessage"/>.
+    ///     Parses the <paramref name="input"/> into an instance of <see cref="Message"/>.
     /// </summary>
     /// <param name="input">Raw IRC message.</param>
-    /// <returns><see cref="IrcMessage"/> instance parsed from <paramref name="input"/>.</returns>
+    /// <returns><see cref="Message"/> instance parsed from <paramref name="input"/>.</returns>
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     /// <exception cref="ArgumentException"><paramref name="input"/> is empty.</exception>
-    public static IrcMessage Parse(ReadOnlySpan<char> input)
+    public static Message Parse(ReadOnlySpan<char> input)
     {
         if (input.IsEmpty)
             throw new ArgumentException("Argument cannot be empty", nameof(input));
 
-        MessageTags? tags;
-        MessagePrefix? prefix;
-        IrcCommand command;
+        Tags? tags;
+        Prefix? prefix;
+        Command command;
         string? arg;
-        MessageContent? content;
+        Content? content;
 
         int i;
 
@@ -64,7 +64,7 @@ public class IrcMessage
             if (i == -1)
                 throw new FormatException("Missing tags ending");
 
-            tags = MessageTags.Parse(input[..i]);
+            tags = Tags.Parse(input[..i]);
             input = input[(i + 1)..];
         }
         else
@@ -81,7 +81,7 @@ public class IrcMessage
             if (i == -1)
                 throw new FormatException("Missing prefix ending");
 
-            prefix = MessagePrefix.Parse(input[..i]);
+            prefix = Prefix.Parse(input[..i]);
             input = input[(i + 1)..];
         }
         else
@@ -93,7 +93,7 @@ public class IrcMessage
         i = input.IndexOf(' ');
         if (i != -1)
         {
-            command = IrcCommandParser.Parse(input[..i]);
+            command = CommandParser.Parse(input[..i]);
             input = input[(i + 1)..];
 
             // No Arg
@@ -122,16 +122,16 @@ public class IrcMessage
 
             content = input.IsEmpty
                 ? null
-                : MessageContent.Parse(input);
+                : Content.Parse(input);
         }
         else
         {
-            command = IrcCommandParser.Parse(input);
+            command = CommandParser.Parse(input);
             arg = null;
             content = null;
         }
 
-        return new IrcMessage
+        return new Message
         {
             Arg = arg,
             Command = command,
@@ -158,7 +158,7 @@ public class IrcMessage
                 .Append(Prefix)
                 .Append(' ');
 
-        result.Append(IrcCommandParser.ToString(Command));
+        result.Append(CommandParser.ToString(Command));
 
         if (Arg is not null)
             result
