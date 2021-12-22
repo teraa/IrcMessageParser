@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-namespace IrcMessageParser;
+namespace Teraa.IrcMessageParser;
 
 /// <summary>
 ///     Class representing a collection of key/value pairs of <see cref="IrcMessage"/> tags.

@@ -1,6 +1,6 @@
 using System;
 
-namespace IrcMessageParser;
+namespace Teraa.IrcMessageParser;
 
 /// <summary>
 ///     Class for parsing <see cref="IrcCommand"/> values.

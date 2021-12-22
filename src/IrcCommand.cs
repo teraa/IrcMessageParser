@@ -1,4 +1,4 @@
-namespace IrcMessageParser;
+namespace Teraa.IrcMessageParser;
 
 /// <summary>
 ///     IRC message command.

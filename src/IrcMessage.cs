@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 
-namespace IrcMessageParser;
+namespace Teraa.IrcMessageParser;
 
 /// <summary>
 ///     Class representing an IRC message.

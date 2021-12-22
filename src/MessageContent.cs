@@ -1,6 +1,6 @@
 using System;
 
-namespace IrcMessageParser;
+namespace Teraa.IrcMessageParser;
 
 /// <summary>
 ///     Record representing content of a <see cref="IrcMessage"/>.

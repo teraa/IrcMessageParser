@@ -1,7 +1,7 @@
 using System;
 using Xunit;
 
-namespace IrcMessageParser.Tests;
+namespace Teraa.IrcMessageParser.Tests;
 
 public class IrcCommandParserTests
 {

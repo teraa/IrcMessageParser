@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Xunit;
 
-namespace IrcMessageParser.Tests;
+namespace Teraa.IrcMessageParser.Tests;
 
 public class IrcMessageToStringTests
 {
