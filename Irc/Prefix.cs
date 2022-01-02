@@ -55,8 +55,28 @@ public record Prefix
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Prefix Parse(ReadOnlySpan<char> input)
     {
+        ParseStatus status = Parse(input, out Prefix result);
+        if (status is ParseStatus.Success)
+            return result;
+
+        string? message = status switch
+        {
+            ParseStatus.FailEmpty => "Input is empty",
+            ParseStatus.FailEmptyHost => "Host part of the prefix is empty",
+            ParseStatus.FailEmptyUser => "User part of the prefix is empty",
+            ParseStatus.FailEmptyName => "Name part of the prefix is empty",
+            _ => null,
+        };
+
+        throw new FormatException(message);
+    }
+
+    internal static ParseStatus Parse(ReadOnlySpan<char> input, out Prefix result)
+    {
+        result = null!;
+
         if (input.IsEmpty)
-            throw new FormatException("Input is empty");
+            return ParseStatus.FailEmpty;
 
         string name;
         string? user, host;
@@ -67,7 +87,7 @@ public record Prefix
         {
             var hostSpan = input[(i + 1)..];
             if (hostSpan.IsEmpty)
-                throw new FormatException("Host part of the prefix is empty");
+                return ParseStatus.FailEmptyHost;
 
             host = hostSpan.ToString();
             input = input[..i];
@@ -83,7 +103,7 @@ public record Prefix
         {
             var userSpan = input[(i + 1)..];
             if (userSpan.IsEmpty)
-                throw new FormatException("User part of the prefix is empty");
+                return ParseStatus.FailEmptyUser;
 
             user = userSpan.ToString();
             input = input[..i];
@@ -94,11 +114,13 @@ public record Prefix
         }
 
         if (input.IsEmpty)
-            throw new FormatException("Name part of the prefix is empty");
+            return ParseStatus.FailEmptyName;
 
         name = input.ToString();
 
-        return new Prefix(name, user, host);
+        result = new Prefix(name, user, host);
+
+        return ParseStatus.Success;
     }
 
     /// <inheritdoc/>
@@ -111,5 +133,14 @@ public record Prefix
             (null, not null) => $"{Name}@{Host}",
             (null, null) => Name,
         };
+    }
+
+    internal enum ParseStatus
+    {
+        Success,
+        FailEmpty,
+        FailEmptyHost,
+        FailEmptyUser,
+        FailEmptyName,
     }
 }

@@ -1,5 +1,5 @@
-using System;
 using Xunit;
+using static Teraa.Irc.CommandParser;
 
 namespace Teraa.Irc.Tests;
 
@@ -25,22 +25,6 @@ public class CommandParserTests
         Assert.Equal(expected, parsed);
     }
 
-
-    [Theory]
-    [InlineData("")]
-    [InlineData("1")]
-    [InlineData("10")]
-    [InlineData("1000")]
-    [InlineData("-10")]
-    [InlineData("-100")]
-    [InlineData("invalid")]
-    public void Parse_Throws(string input)
-    {
-        Assert.Throws<FormatException>(
-            () => CommandParser.Parse(input)
-        );
-    }
-
     [Theory]
     [InlineData(Command.ADMIN, "ADMIN")]
     [InlineData(Command.PING, "PING")]
@@ -53,5 +37,20 @@ public class CommandParserTests
     {
         var actual = CommandParser.ToString(command);
         Assert.Equal(expected, actual);
+    }
+
+    [Theory]
+    [InlineData("100", ParseStatus.Success)]
+    [InlineData("", ParseStatus.FailEmpty)]
+    [InlineData("1", ParseStatus.FailFormat)]
+    [InlineData("10", ParseStatus.FailFormat)]
+    [InlineData("1000", ParseStatus.FailFormat)]
+    [InlineData("-10", ParseStatus.FailFormat)]
+    [InlineData("-100", ParseStatus.FailFormat)]
+    [InlineData("invalid", ParseStatus.FailFormat)]
+    internal void ParseStatusTest(string input, ParseStatus expectedStatus)
+    {
+        var status = CommandParser.Parse(input, out _);
+        Assert.Equal(expectedStatus, status);
     }
 }

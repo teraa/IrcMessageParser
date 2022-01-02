@@ -43,8 +43,27 @@ public class Tags : IReadOnlyDictionary<string, string>
     /// <exception cref="FormatException"><paramref name="input"/> is empty.</exception>
     public static Tags Parse(ReadOnlySpan<char> input)
     {
+        ParseStatus status = Parse(input, out Tags result);
+        if (status is ParseStatus.Success)
+            return result;
+
+        string? message = status switch
+        {
+            ParseStatus.FailEmpty => "Input is empty",
+            ParseStatus.FailTrailingSemicolon => "Trailing semicolon",
+            ParseStatus.FailKeyEmpty => "A tag key is empty",
+            _ => null,
+        };
+
+        throw new FormatException(message);
+    }
+
+    internal static ParseStatus Parse(ReadOnlySpan<char> input, out Tags result)
+    {
+        result = null!;
+
         if (input.IsEmpty)
-            throw new FormatException("Input is empty");
+            return ParseStatus.FailEmpty;
 
         Dictionary<string, string> tags = new();
 
@@ -64,7 +83,7 @@ public class Tags : IReadOnlyDictionary<string, string>
                 input = input[(i + 1)..];
 
                 if (input.IsEmpty)
-                    throw new FormatException("Trailing semicolon");
+                    return ParseStatus.FailTrailingSemicolon;
             }
 
             ReadOnlySpan<char> key, value;
@@ -81,13 +100,15 @@ public class Tags : IReadOnlyDictionary<string, string>
             }
 
             if (key.IsEmpty)
-                throw new FormatException("A tag key is empty");
+                return ParseStatus.FailKeyEmpty;
 
             tags[key.ToString()] = value.ToString();
 
         } while (!input.IsEmpty);
 
-        return new Tags(tags);
+        result = new Tags(tags);
+
+        return ParseStatus.Success;
     }
 
     /// <summary>
@@ -223,4 +244,12 @@ public class Tags : IReadOnlyDictionary<string, string>
 
     IEnumerator IEnumerable.GetEnumerator()
         => _tags.GetEnumerator();
+
+    internal enum ParseStatus
+    {
+        Success,
+        FailEmpty,
+        FailTrailingSemicolon,
+        FailKeyEmpty,
+    }
 }

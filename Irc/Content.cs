@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Teraa.Irc;
 
@@ -62,8 +63,26 @@ public record Content
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Content Parse(ReadOnlySpan<char> input)
     {
+        ParseStatus status = Parse(input, out Content result);
+        if (status is ParseStatus.Success)
+            return result;
+
+        string? message = status switch
+        {
+            ParseStatus.FailEmpty => "Input is empty",
+            ParseStatus.FailMissingCtcpEnding => "Missing CTCP ending",
+            _ => null,
+        };
+
+        throw new FormatException(message);
+    }
+
+    internal static ParseStatus Parse(ReadOnlySpan<char> input, out Content result)
+    {
+        result = null!;
+
         if (input.IsEmpty)
-            throw new FormatException("Input is empty");
+            return ParseStatus.FailEmpty;
 
         string? ctcp;
         if (input[0] == s_ctcpDelimiter)
@@ -75,7 +94,7 @@ public record Content
             int i = input.IndexOf(' ');
 
             if (i == -1)
-                throw new FormatException("Missing CTCP ending");
+                return ParseStatus.FailMissingCtcpEnding;
 
             ctcp = input[..i].ToString();
             input = input[(i + 1)..];
@@ -87,9 +106,18 @@ public record Content
 
         string text = input.ToString();
 
-        return new Content(text, ctcp);
+        result = new Content(text, ctcp);
+
+        return ParseStatus.Success;
     }
 
     /// <inheritdoc/>
     public override string ToString() => this;
+
+    internal enum ParseStatus
+    {
+        Success,
+        FailEmpty,
+        FailMissingCtcpEnding,
+    }
 }

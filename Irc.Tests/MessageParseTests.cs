@@ -1,5 +1,5 @@
-using System;
 using Xunit;
+using static Teraa.Irc.Message;
 
 namespace Teraa.Irc.Tests;
 
@@ -232,18 +232,20 @@ public class MessageParseTests
     }
 
     [Theory]
-    [InlineData("")] // empty message
-    [InlineData("@ ")] // empty tags
-    [InlineData(": ")] // empty prefix
-    [InlineData("@tag")] // no tags ending
-    [InlineData("@tag ")] // nothing after tags ending
-    [InlineData("@tag :name")] // no prefix ending
-    [InlineData("@tag :name ")] // nothing after prefix ending
-    [InlineData("@tag :name PING ")] // Trailing space after command
-    public void ThrowsFormatException(string input)
+    [InlineData("PING", ParseStatus.Success)]
+    [InlineData("", ParseStatus.FailEmpty)]
+    [InlineData("@ ", ParseStatus.FailTags)]
+    [InlineData(": ", ParseStatus.FailPrefix)]
+    [InlineData("0", ParseStatus.FailCommand)]
+    [InlineData("PING :\u0001ACTION", ParseStatus.FailContent)]
+    [InlineData("@tag", ParseStatus.FailNoCommandMissingTagsEnding)]
+    [InlineData("@tag ", ParseStatus.FailNoCommandAfterTagsEnding)]
+    [InlineData("@tag :name", ParseStatus.FailNoCommandMissingPrefixEnding)]
+    [InlineData("@tag :name ", ParseStatus.FailNoCommandAfterPrefixEnding)]
+    [InlineData("@tag :name PING ", ParseStatus.FailTrailingSpaceAfterCommand)]
+    internal void ParseStatusTest(string input, ParseStatus expectedStatus)
     {
-        Assert.Throws<FormatException>(
-            () => Message.Parse(input)
-        );
+        var status = Message.Parse(input, out _);
+        Assert.Equal(expectedStatus, status);
     }
 }

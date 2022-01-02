@@ -53,8 +53,34 @@ public class Message
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Message Parse(ReadOnlySpan<char> input)
     {
+        ParseStatus status = Parse(input, out Message result);
+        if (status is ParseStatus.Success)
+            return result;
+
+        string? message = status switch
+        {
+            ParseStatus.FailEmpty => "Input is empty",
+            ParseStatus.FailTags => "Message tags invalid format",
+            ParseStatus.FailPrefix => "Message prefix invalid format",
+            ParseStatus.FailCommand => "Message command invalid format",
+            ParseStatus.FailContent => "Message content invalid format",
+            ParseStatus.FailNoCommandMissingTagsEnding => "Missing command (no tags ending)",
+            ParseStatus.FailNoCommandAfterTagsEnding => "Missing command (nothing after tags ending)",
+            ParseStatus.FailNoCommandMissingPrefixEnding => "Missing command (no prefix ending)",
+            ParseStatus.FailNoCommandAfterPrefixEnding => "Missing command (nothing after prefix ending)",
+            ParseStatus.FailTrailingSpaceAfterCommand => "Trailing space after command",
+            _ => null,
+        };
+
+        throw new FormatException(message);
+    }
+
+    internal static ParseStatus Parse(ReadOnlySpan<char> input, out Message result)
+    {
+        result = null!;
+
         if (input.IsEmpty)
-            throw new FormatException("Input is empty");
+            return ParseStatus.FailEmpty;
 
         Tags? tags;
         Prefix? prefix;
@@ -71,13 +97,15 @@ public class Message
             i = input.IndexOf(' ');
 
             if (i == -1)
-                throw new FormatException("Missing command (no tags ending)");
+                return ParseStatus.FailNoCommandMissingTagsEnding;
 
-            tags = Tags.Parse(input[..i]);
+            if (Tags.Parse(input[..i], out tags) != Tags.ParseStatus.Success)
+                return ParseStatus.FailTags;
+
             input = input[(i + 1)..];
 
             if (input.IsEmpty)
-                throw new FormatException("Missing command (nothing after tags ending)");
+                return ParseStatus.FailNoCommandAfterTagsEnding;
         }
         else
         {
@@ -91,13 +119,15 @@ public class Message
             i = input.IndexOf(' ');
 
             if (i == -1)
-                throw new FormatException("Missing command (no prefix ending)");
+                return ParseStatus.FailNoCommandMissingPrefixEnding;
 
-            prefix = Prefix.Parse(input[..i]);
+            if (Prefix.Parse(input[..i], out prefix) != Prefix.ParseStatus.Success)
+                return ParseStatus.FailPrefix;
+
             input = input[(i + 1)..];
 
             if (input.IsEmpty)
-                throw new FormatException("Missing command (nothing after prefix ending)");
+                return ParseStatus.FailNoCommandAfterPrefixEnding;
         }
         else
         {
@@ -108,11 +138,13 @@ public class Message
         i = input.IndexOf(' ');
         if (i != -1)
         {
-            command = CommandParser.Parse(input[..i]);
+            if (CommandParser.Parse(input[..i], out command) != CommandParser.ParseStatus.Success)
+                return ParseStatus.FailCommand;
+
             input = input[(i + 1)..];
 
             if (input.IsEmpty)
-                throw new FormatException("Trailing space after command");
+                return ParseStatus.FailTrailingSpaceAfterCommand;
 
             // No Arg
             if (input[0] == ':')
@@ -138,18 +170,26 @@ public class Message
                 }
             }
 
-            content = input.IsEmpty
-                ? null
-                : Content.Parse(input);
+            if (input.IsEmpty)
+            {
+                content = null;
+            }
+            else
+            {
+                if (Content.Parse(input, out content) != Content.ParseStatus.Success)
+                    return ParseStatus.FailContent;
+            }
         }
         else
         {
-            command = CommandParser.Parse(input);
+            if (CommandParser.Parse(input, out command) != CommandParser.ParseStatus.Success)
+                return ParseStatus.FailCommand;
+
             arg = null;
             content = null;
         }
 
-        return new Message
+        result = new Message
         {
             Arg = arg,
             Command = command,
@@ -157,6 +197,8 @@ public class Message
             Prefix = prefix,
             Tags = tags
         };
+
+        return ParseStatus.Success;
     }
 
     /// <inheritdoc/>
@@ -190,5 +232,20 @@ public class Message
 
 
         return result.ToString();
+    }
+
+    internal enum ParseStatus
+    {
+        Success,
+        FailEmpty,
+        FailTags,
+        FailPrefix,
+        FailCommand,
+        FailContent,
+        FailNoCommandMissingTagsEnding,
+        FailNoCommandAfterTagsEnding,
+        FailNoCommandMissingPrefixEnding,
+        FailNoCommandAfterPrefixEnding,
+        FailTrailingSpaceAfterCommand,
     }
 }

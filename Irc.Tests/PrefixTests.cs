@@ -1,5 +1,5 @@
-using System;
 using Xunit;
+using static Teraa.Irc.Prefix;
 
 namespace Teraa.Irc.Tests;
 
@@ -78,18 +78,21 @@ public class PrefixTests
     }
 
     [Theory]
-    [InlineData("nick!@host")]
-    [InlineData("nick!user@")]
-    [InlineData("nick!@")]
-    [InlineData("nick!")]
-    [InlineData("nick@")]
-    [InlineData("!")]
-    [InlineData("@")]
-    [InlineData("")]
-    public void Parse_ThrowsFormatException(string input)
+    [InlineData("nick!user@host", ParseStatus.Success)]
+    [InlineData("nick!@host", ParseStatus.FailEmptyUser)]
+    [InlineData("nick!user@", ParseStatus.FailEmptyHost)]
+    [InlineData("nick!@", ParseStatus.FailEmptyHost)]
+    [InlineData("nick!", ParseStatus.FailEmptyUser)]
+    [InlineData("nick@", ParseStatus.FailEmptyHost)]
+    [InlineData("!", ParseStatus.FailEmptyUser)]
+    [InlineData("@", ParseStatus.FailEmptyHost)]
+    [InlineData("", ParseStatus.FailEmpty)]
+    [InlineData("!user", ParseStatus.FailEmptyName)]
+    [InlineData("@host", ParseStatus.FailEmptyName)]
+    [InlineData("!user@host", ParseStatus.FailEmptyName)]
+    internal void ParseStatusTest(string input, ParseStatus expectedStatus)
     {
-        Assert.Throws<FormatException>(
-            () => Prefix.Parse(input)
-        );
+        var status = Prefix.Parse(input, out _);
+        Assert.Equal(expectedStatus, status);
     }
 }

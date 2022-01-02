@@ -28,15 +28,37 @@ public static class CommandParser
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Command Parse(ReadOnlySpan<char> input)
     {
-        if (input.Length == 3 && ushort.TryParse(input, out var numeric))
-            return (Command)numeric;
+        ParseStatus status = Parse(input, out Command result);
+        if (status is ParseStatus.Success)
+            return result;
 
-        if (Enum.TryParse<Command>(input, true, out var command)
+        string? message = status switch
+        {
+            ParseStatus.FailEmpty => "Input is empty",
+            ParseStatus.FailFormat => $"Invalid command format: {input.ToString()}",
+            _ => null,
+        };
+
+        throw new FormatException(message);
+    }
+
+    internal static ParseStatus Parse(ReadOnlySpan<char> input, out Command result)
+    {
+        result = 0;
+
+        if (input.IsEmpty)
+            return ParseStatus.FailEmpty;
+
+        if (input.Length == 3 && ushort.TryParse(input, out var numeric))
+            result = (Command)numeric;
+        else if (Enum.TryParse<Command>(input, true, out var command)
             && command is > s_maxNumeric
             && (input[0] is (< '0' or > '9')))
-                return command;
+                result = command;
+        else
+            return ParseStatus.FailFormat;
 
-        throw new FormatException($"Invalid command format: {input.ToString()}");
+        return ParseStatus.Success;
     }
 
     /// <summary>
@@ -50,5 +72,12 @@ public static class CommandParser
             return command.ToString();
 
         return ((ushort)command).ToString("d3");
+    }
+
+    internal enum ParseStatus
+    {
+        Success,
+        FailEmpty,
+        FailFormat,
     }
 }

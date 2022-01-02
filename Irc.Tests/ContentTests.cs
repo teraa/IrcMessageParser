@@ -1,5 +1,5 @@
-using System;
 using Xunit;
+using static Teraa.Irc.Content;
 
 namespace Teraa.Irc.Tests;
 
@@ -38,16 +38,6 @@ public class ContentTests
         Assert.Equal(raw + "\u0001", content);
     }
 
-    [Theory]
-    [InlineData("")] // empty
-    [InlineData("\u0001ACTION")] // Missing CTCP ending
-    public void Parse_ThrowsFormatException(string input)
-    {
-        Assert.Throws<FormatException>(
-            () => Content.Parse(input)
-        );
-    }
-
     [Fact]
     public void NoCtcp_ToString()
     {
@@ -60,5 +50,15 @@ public class ContentTests
     {
         var content = new Content("text", "ACTION");
         Assert.Equal("\u0001ACTION text\u0001", content.ToString());
+    }
+
+    [Theory]
+    [InlineData("x", ParseStatus.Success)]
+    [InlineData("", ParseStatus.FailEmpty)]
+    [InlineData("\u0001ACTION", ParseStatus.FailMissingCtcpEnding)]
+    internal void ParseStatusTest(string input, ParseStatus expectedStatus)
+    {
+        var status = Content.Parse(input, out _);
+        Assert.Equal(expectedStatus, status);
     }
 }

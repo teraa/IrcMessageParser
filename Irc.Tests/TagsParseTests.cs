@@ -1,5 +1,5 @@
-using System;
 using Xunit;
+using static Teraa.Irc.Tags;
 
 namespace Teraa.Irc.Tests;
 
@@ -138,14 +138,14 @@ public class TagsParseTests
     }
 
     [Theory]
-    [InlineData("")]
-    [InlineData(";")]
-    [InlineData("x;")]
-    [InlineData("x;;x")]
-    public void ThrowsFormatException(string input)
+    [InlineData("x", ParseStatus.Success)]
+    [InlineData("", ParseStatus.FailEmpty)]
+    [InlineData(";", ParseStatus.FailTrailingSemicolon)]
+    [InlineData("x;", ParseStatus.FailTrailingSemicolon)]
+    [InlineData("x;;x", ParseStatus.FailKeyEmpty)]
+    internal void ParseStatusTest(string input, ParseStatus expectedStatus)
     {
-        Assert.Throws<FormatException>(
-            () => Tags.Parse(input)
-        );
+        var status = Tags.Parse(input, out _);
+        Assert.Equal(expectedStatus, status);
     }
 }
