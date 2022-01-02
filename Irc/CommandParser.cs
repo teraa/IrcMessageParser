@@ -33,14 +33,7 @@ public static class CommandParser
         if (status is ParseStatus.Success)
             return result;
 
-        string? message = status switch
-        {
-            ParseStatus.FailEmpty => "Input is empty",
-            ParseStatus.FailFormat => $"Invalid command format: {input.ToString()}",
-            _ => null,
-        };
-
-        throw new FormatException(message);
+        throw new FormatException(ParseStatusToString(status));
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Command)"/>
@@ -87,6 +80,17 @@ public static class CommandParser
             return ParseStatus.FailFormat;
 
         return ParseStatus.Success;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static string? ParseStatusToString(ParseStatus status)
+    {
+        return status switch
+        {
+            ParseStatus.FailEmpty => "Input is empty",
+            ParseStatus.FailFormat => "Invalid format",
+            _ => null,
+        };
     }
 
     internal enum ParseStatus

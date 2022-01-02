@@ -246,7 +246,7 @@ public class MessageParseTests
     [InlineData("@tag :name PING ", ParseStatus.FailTrailingSpaceAfterCommand)]
     internal void ParseStatusTest(string input, ParseStatus expectedStatus)
     {
-        var status = Message.Parse(input, out _);
+        (var status, _) = Message.Parse(input, out _);
         Assert.Equal(expectedStatus, status);
 
         var success = Message.TryParse(input, out _);

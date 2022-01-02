@@ -54,26 +54,11 @@ public class Message
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Message Parse(ReadOnlySpan<char> input)
     {
-        ParseStatus status = Parse(input, out Message result);
+        (ParseStatus status, int innerStatus) = Parse(input, out Message result);
         if (status is ParseStatus.Success)
             return result;
 
-        string? message = status switch
-        {
-            ParseStatus.FailEmpty => "Input is empty",
-            ParseStatus.FailTags => "Message tags invalid format",
-            ParseStatus.FailPrefix => "Message prefix invalid format",
-            ParseStatus.FailCommand => "Message command invalid format",
-            ParseStatus.FailContent => "Message content invalid format",
-            ParseStatus.FailNoCommandMissingTagsEnding => "Missing command (no tags ending)",
-            ParseStatus.FailNoCommandAfterTagsEnding => "Missing command (nothing after tags ending)",
-            ParseStatus.FailNoCommandMissingPrefixEnding => "Missing command (no prefix ending)",
-            ParseStatus.FailNoCommandAfterPrefixEnding => "Missing command (nothing after prefix ending)",
-            ParseStatus.FailTrailingSpaceAfterCommand => "Trailing space after command",
-            _ => null,
-        };
-
-        throw new FormatException(message);
+        throw new FormatException(ParseStatusToString(status, innerStatus));
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Message)"/>
@@ -87,7 +72,7 @@ public class Message
     /// <param name="result">parsed message if method returns <see langword="true"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise, <see langword="false"/>.</returns>
     public static bool TryParse(ReadOnlySpan<char> input, out Message result)
-        => Parse(input, out result) == ParseStatus.Success;
+        => Parse(input, out result).status == ParseStatus.Success;
 
     /// <inheritdoc/>
     public override string ToString()
@@ -122,12 +107,13 @@ public class Message
         return result.ToString();
     }
 
-    internal static ParseStatus Parse(ReadOnlySpan<char> input, out Message result)
+    internal static (ParseStatus status, int innerStatus) Parse(ReadOnlySpan<char> input, out Message result)
     {
         result = null!;
+        int innerStatus = 0;
 
         if (input.IsEmpty)
-            return ParseStatus.FailEmpty;
+            return (ParseStatus.FailEmpty, 0);
 
         Tags? tags;
         Prefix? prefix;
@@ -144,15 +130,16 @@ public class Message
             i = input.IndexOf(' ');
 
             if (i == -1)
-                return ParseStatus.FailNoCommandMissingTagsEnding;
+                return (ParseStatus.FailNoCommandMissingTagsEnding, 0);
 
-            if (Tags.Parse(input[..i], out tags) != Tags.ParseStatus.Success)
-                return ParseStatus.FailTags;
+            innerStatus = (int)Tags.Parse(input[..i], out tags);
+            if (innerStatus != (int)Tags.ParseStatus.Success)
+                return (ParseStatus.FailTags, innerStatus);
 
             input = input[(i + 1)..];
 
             if (input.IsEmpty)
-                return ParseStatus.FailNoCommandAfterTagsEnding;
+                return (ParseStatus.FailNoCommandAfterTagsEnding, 0);
         }
         else
         {
@@ -166,15 +153,16 @@ public class Message
             i = input.IndexOf(' ');
 
             if (i == -1)
-                return ParseStatus.FailNoCommandMissingPrefixEnding;
+                return (ParseStatus.FailNoCommandMissingPrefixEnding, 0);
 
-            if (Prefix.Parse(input[..i], out prefix) != Prefix.ParseStatus.Success)
-                return ParseStatus.FailPrefix;
+            innerStatus = (int)Prefix.Parse(input[..i], out prefix);
+            if (innerStatus != (int)Prefix.ParseStatus.Success)
+                return (ParseStatus.FailPrefix, innerStatus);
 
             input = input[(i + 1)..];
 
             if (input.IsEmpty)
-                return ParseStatus.FailNoCommandAfterPrefixEnding;
+                return (ParseStatus.FailNoCommandAfterPrefixEnding, 0);
         }
         else
         {
@@ -185,13 +173,14 @@ public class Message
         i = input.IndexOf(' ');
         if (i != -1)
         {
-            if (CommandParser.Parse(input[..i], out command) != CommandParser.ParseStatus.Success)
-                return ParseStatus.FailCommand;
+            innerStatus = (int)CommandParser.Parse(input[..i], out command);
+            if (innerStatus != (int)CommandParser.ParseStatus.Success)
+                return (ParseStatus.FailCommand, innerStatus);
 
             input = input[(i + 1)..];
 
             if (input.IsEmpty)
-                return ParseStatus.FailTrailingSpaceAfterCommand;
+                return (ParseStatus.FailTrailingSpaceAfterCommand, 0);
 
             // No Arg
             if (input[0] == ':')
@@ -223,14 +212,16 @@ public class Message
             }
             else
             {
-                if (Content.Parse(input, out content) != Content.ParseStatus.Success)
-                    return ParseStatus.FailContent;
+                innerStatus = (int)Content.Parse(input, out content);
+                if (innerStatus != (int)Content.ParseStatus.Success)
+                    return (ParseStatus.FailContent, innerStatus);
             }
         }
         else
         {
-            if (CommandParser.Parse(input, out command) != CommandParser.ParseStatus.Success)
-                return ParseStatus.FailCommand;
+            innerStatus = (int)CommandParser.Parse(input, out command);
+            if (innerStatus != (int)CommandParser.ParseStatus.Success)
+                return (ParseStatus.FailCommand, innerStatus);
 
             arg = null;
             content = null;
@@ -245,7 +236,26 @@ public class Message
             Tags = tags
         };
 
-        return ParseStatus.Success;
+        return (ParseStatus.Success, 0);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static string? ParseStatusToString(ParseStatus status, int innerStatus)
+    {
+        return status switch
+        {
+            ParseStatus.FailEmpty => "Input is empty",
+            ParseStatus.FailTags => $"Tags: {Tags.ParseStatusToString((Tags.ParseStatus)innerStatus)}",
+            ParseStatus.FailPrefix => $"Prefix: {Prefix.ParseStatusToString((Prefix.ParseStatus)innerStatus)}",
+            ParseStatus.FailCommand => $"Command: {CommandParser.ParseStatusToString((CommandParser.ParseStatus)innerStatus)}",
+            ParseStatus.FailContent => $"Content: {Content.ParseStatusToString((Content.ParseStatus)innerStatus)}",
+            ParseStatus.FailNoCommandMissingTagsEnding => "Missing command (no tags ending)",
+            ParseStatus.FailNoCommandAfterTagsEnding => "Missing command (nothing after tags ending)",
+            ParseStatus.FailNoCommandMissingPrefixEnding => "Missing command (no prefix ending)",
+            ParseStatus.FailNoCommandAfterPrefixEnding => "Missing command (nothing after prefix ending)",
+            ParseStatus.FailTrailingSpaceAfterCommand => "Trailing space after command",
+            _ => null,
+        };
     }
 
     internal enum ParseStatus

@@ -68,14 +68,7 @@ public record Content
         if (status is ParseStatus.Success)
             return result;
 
-        string? message = status switch
-        {
-            ParseStatus.FailEmpty => "Input is empty",
-            ParseStatus.FailMissingCtcpEnding => "Missing CTCP ending",
-            _ => null,
-        };
-
-        throw new FormatException(message);
+        throw new FormatException(ParseStatusToString(status));
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Content)"/>
@@ -127,6 +120,17 @@ public record Content
         result = new Content(text, ctcp);
 
         return ParseStatus.Success;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static string? ParseStatusToString(ParseStatus status)
+    {
+        return status switch
+        {
+            ParseStatus.FailEmpty => "Input is empty",
+            ParseStatus.FailMissingCtcpEnding => "Missing CTCP ending",
+            _ => null,
+        };
     }
 
     internal enum ParseStatus

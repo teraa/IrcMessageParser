@@ -60,16 +60,7 @@ public record Prefix
         if (status is ParseStatus.Success)
             return result;
 
-        string? message = status switch
-        {
-            ParseStatus.FailEmpty => "Input is empty",
-            ParseStatus.FailEmptyHost => "Host part of the prefix is empty",
-            ParseStatus.FailEmptyUser => "User part of the prefix is empty",
-            ParseStatus.FailEmptyName => "Name part of the prefix is empty",
-            _ => null,
-        };
-
-        throw new FormatException(message);
+        throw new FormatException(ParseStatusToString(status));
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Prefix)"/>
@@ -148,6 +139,19 @@ public record Prefix
         result = new Prefix(name, user, host);
 
         return ParseStatus.Success;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static string? ParseStatusToString(ParseStatus status)
+    {
+        return status switch
+        {
+            ParseStatus.FailEmpty => "Input is empty",
+            ParseStatus.FailEmptyHost => "Host is empty",
+            ParseStatus.FailEmptyUser => "User is empty",
+            ParseStatus.FailEmptyName => "Name is empty",
+            _ => null,
+        };
     }
 
     internal enum ParseStatus

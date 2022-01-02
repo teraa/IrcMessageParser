@@ -48,15 +48,7 @@ public class Tags : IReadOnlyDictionary<string, string>
         if (status is ParseStatus.Success)
             return result;
 
-        string? message = status switch
-        {
-            ParseStatus.FailEmpty => "Input is empty",
-            ParseStatus.FailTrailingSemicolon => "Trailing semicolon",
-            ParseStatus.FailKeyEmpty => "A tag key is empty",
-            _ => null,
-        };
-
-        throw new FormatException(message);
+        throw new FormatException(ParseStatusToString(status));
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Tags)"/>
@@ -258,6 +250,18 @@ public class Tags : IReadOnlyDictionary<string, string>
         result = new Tags(tags);
 
         return ParseStatus.Success;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static string? ParseStatusToString(ParseStatus status)
+    {
+        return status switch
+        {
+            ParseStatus.FailEmpty => "Input is empty",
+            ParseStatus.FailTrailingSemicolon => "Trailing semicolon",
+            ParseStatus.FailKeyEmpty => "A tag key is empty",
+            _ => null,
+        };
     }
 
     internal enum ParseStatus
