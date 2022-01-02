@@ -71,6 +71,18 @@ public record Prefix
         throw new FormatException(message);
     }
 
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        return (User, Host) switch
+        {
+            (not null, not null) => $"{Name}!{User}@{Host}",
+            (not null, null) => $"{Name}!{User}",
+            (null, not null) => $"{Name}@{Host}",
+            (null, null) => Name,
+        };
+    }
+
     internal static ParseStatus Parse(ReadOnlySpan<char> input, out Prefix result)
     {
         result = null!;
@@ -121,18 +133,6 @@ public record Prefix
         result = new Prefix(name, user, host);
 
         return ParseStatus.Success;
-    }
-
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        return (User, Host) switch
-        {
-            (not null, not null) => $"{Name}!{User}@{Host}",
-            (not null, null) => $"{Name}!{User}",
-            (null, not null) => $"{Name}@{Host}",
-            (null, null) => Name,
-        };
     }
 
     internal enum ParseStatus

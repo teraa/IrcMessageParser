@@ -42,6 +42,19 @@ public static class CommandParser
         throw new FormatException(message);
     }
 
+    /// <summary>
+    ///     Returns the <see cref="string"/> representation of the <see cref="Command"/>
+    /// </summary>
+    /// <param name="command">Input command.</param>
+    /// <returns><see cref="string"/> representing the command.</returns>
+    public static string ToString(Command command)
+    {
+        if (command is > s_maxNumeric)
+            return command.ToString();
+
+        return ((ushort)command).ToString("d3");
+    }
+
     internal static ParseStatus Parse(ReadOnlySpan<char> input, out Command result)
     {
         result = 0;
@@ -59,19 +72,6 @@ public static class CommandParser
             return ParseStatus.FailFormat;
 
         return ParseStatus.Success;
-    }
-
-    /// <summary>
-    ///     Returns the <see cref="string"/> representation of the <see cref="Command"/>
-    /// </summary>
-    /// <param name="command">Input command.</param>
-    /// <returns><see cref="string"/> representing the command.</returns>
-    public static string ToString(Command command)
-    {
-        if (command is > s_maxNumeric)
-            return command.ToString();
-
-        return ((ushort)command).ToString("d3");
     }
 
     internal enum ParseStatus

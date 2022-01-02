@@ -58,59 +58,6 @@ public class Tags : IReadOnlyDictionary<string, string>
         throw new FormatException(message);
     }
 
-    internal static ParseStatus Parse(ReadOnlySpan<char> input, out Tags result)
-    {
-        result = null!;
-
-        if (input.IsEmpty)
-            return ParseStatus.FailEmpty;
-
-        Dictionary<string, string> tags = new();
-
-        int i;
-        ReadOnlySpan<char> tag;
-        do
-        {
-            i = input.IndexOf(';');
-            if (i == -1)
-            {
-                tag = input;
-                input = default;
-            }
-            else
-            {
-                tag = input[..i];
-                input = input[(i + 1)..];
-
-                if (input.IsEmpty)
-                    return ParseStatus.FailTrailingSemicolon;
-            }
-
-            ReadOnlySpan<char> key, value;
-            i = tag.IndexOf('=');
-            if (i == -1)
-            {
-                key = tag;
-                value = default;
-            }
-            else
-            {
-                key = tag[..i];
-                value = ParseValue(tag[(i + 1)..]);
-            }
-
-            if (key.IsEmpty)
-                return ParseStatus.FailKeyEmpty;
-
-            tags[key.ToString()] = value.ToString();
-
-        } while (!input.IsEmpty);
-
-        result = new Tags(tags);
-
-        return ParseStatus.Success;
-    }
-
     /// <summary>
     ///     Parses the input as described in the <see href="https://ircv3.net/specs/extensions/message-tags#escaping-values">IRCv3 spec</see>.
     /// </summary>
@@ -244,6 +191,59 @@ public class Tags : IReadOnlyDictionary<string, string>
 
     IEnumerator IEnumerable.GetEnumerator()
         => _tags.GetEnumerator();
+
+    internal static ParseStatus Parse(ReadOnlySpan<char> input, out Tags result)
+    {
+        result = null!;
+
+        if (input.IsEmpty)
+            return ParseStatus.FailEmpty;
+
+        Dictionary<string, string> tags = new();
+
+        int i;
+        ReadOnlySpan<char> tag;
+        do
+        {
+            i = input.IndexOf(';');
+            if (i == -1)
+            {
+                tag = input;
+                input = default;
+            }
+            else
+            {
+                tag = input[..i];
+                input = input[(i + 1)..];
+
+                if (input.IsEmpty)
+                    return ParseStatus.FailTrailingSemicolon;
+            }
+
+            ReadOnlySpan<char> key, value;
+            i = tag.IndexOf('=');
+            if (i == -1)
+            {
+                key = tag;
+                value = default;
+            }
+            else
+            {
+                key = tag[..i];
+                value = ParseValue(tag[(i + 1)..]);
+            }
+
+            if (key.IsEmpty)
+                return ParseStatus.FailKeyEmpty;
+
+            tags[key.ToString()] = value.ToString();
+
+        } while (!input.IsEmpty);
+
+        result = new Tags(tags);
+
+        return ParseStatus.Success;
+    }
 
     internal enum ParseStatus
     {

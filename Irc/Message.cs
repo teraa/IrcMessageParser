@@ -75,6 +75,39 @@ public class Message
         throw new FormatException(message);
     }
 
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        StringBuilder result = new();
+
+        if (Tags is { Count: > 0 })
+            result
+                .Append('@')
+                .Append(Tags)
+                .Append(' ');
+
+        if (Prefix is not null)
+            result
+                .Append(':')
+                .Append(Prefix)
+                .Append(' ');
+
+        result.Append(CommandParser.ToString(Command));
+
+        if (Arg is not null)
+            result
+                .Append(' ')
+                .Append(Arg);
+
+        if (Content is not null)
+            result
+                .Append(" :")
+                .Append(Content);
+
+
+        return result.ToString();
+    }
+
     internal static ParseStatus Parse(ReadOnlySpan<char> input, out Message result)
     {
         result = null!;
@@ -199,39 +232,6 @@ public class Message
         };
 
         return ParseStatus.Success;
-    }
-
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        StringBuilder result = new();
-
-        if (Tags is { Count: > 0 })
-            result
-                .Append('@')
-                .Append(Tags)
-                .Append(' ');
-
-        if (Prefix is not null)
-            result
-                .Append(':')
-                .Append(Prefix)
-                .Append(' ');
-
-        result.Append(CommandParser.ToString(Command));
-
-        if (Arg is not null)
-            result
-                .Append(' ')
-                .Append(Arg);
-
-        if (Content is not null)
-            result
-                .Append(" :")
-                .Append(Content);
-
-
-        return result.ToString();
     }
 
     internal enum ParseStatus

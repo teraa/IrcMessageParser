@@ -77,6 +77,9 @@ public record Content
         throw new FormatException(message);
     }
 
+    /// <inheritdoc/>
+    public override string ToString() => this;
+
     internal static ParseStatus Parse(ReadOnlySpan<char> input, out Content result)
     {
         result = null!;
@@ -110,9 +113,6 @@ public record Content
 
         return ParseStatus.Success;
     }
-
-    /// <inheritdoc/>
-    public override string ToString() => this;
 
     internal enum ParseStatus
     {
