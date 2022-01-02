@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Teraa.Irc;
@@ -27,6 +28,7 @@ public class Tags : IReadOnlyDictionary<string, string>
 
     /// <inheritdoc cref="Parse(ReadOnlySpan{char})"/>
     /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Tags Parse(string input)
     {
         if (input is null)
@@ -41,6 +43,7 @@ public class Tags : IReadOnlyDictionary<string, string>
     /// </summary>
     /// <param name="input">Tags part of the IRC message.</param>
     /// <exception cref="FormatException"><paramref name="input"/> is empty.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Tags Parse(ReadOnlySpan<char> input)
     {
         ParseStatus status = Parse(input, out Tags result);
@@ -57,6 +60,22 @@ public class Tags : IReadOnlyDictionary<string, string>
 
         throw new FormatException(message);
     }
+
+    /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Tags)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TryParse(string? input, out Tags result)
+        => TryParse(input.AsSpan(), out result);
+
+    /// <summary>
+    ///     Parses the tags from <paramref name="input"/>.
+    ///     See <see href="https://ircv3.net/specs/extensions/message-tags#format">IRCv3 spec</see> for details.
+    /// </summary>
+    /// <param name="input">Input to parse.</param>
+    /// <param name="result">parsed tags if method returns <see langword="true"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise, <see langword="false"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TryParse(ReadOnlySpan<char> input, out Tags result)
+        => Parse(input, out result) == ParseStatus.Success;
 
     /// <summary>
     ///     Parses the input as described in the <see href="https://ircv3.net/specs/extensions/message-tags#escaping-values">IRCv3 spec</see>.

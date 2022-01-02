@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Teraa.Irc;
@@ -37,6 +38,7 @@ public class Message
 
     /// <inheritdoc cref="Parse(ReadOnlySpan{char})"/>
     /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Message Parse(string input)
     {
         if (input is null)
@@ -51,6 +53,7 @@ public class Message
     /// <param name="input">Raw IRC message.</param>
     /// <returns><see cref="Message"/> instance parsed from <paramref name="input"/>.</returns>
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Message Parse(ReadOnlySpan<char> input)
     {
         ParseStatus status = Parse(input, out Message result);
@@ -74,6 +77,21 @@ public class Message
 
         throw new FormatException(message);
     }
+
+    /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Message)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TryParse(string? input, out Message result)
+        => TryParse(input.AsSpan(), out result);
+
+    /// <summary>
+    ///     Parses the <paramref name="input"/> into an instance of <see cref="Message"/>.
+    /// </summary>
+    /// <param name="input">Input to parse.</param>
+    /// <param name="result">parsed message if method returns <see langword="true"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise, <see langword="false"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TryParse(ReadOnlySpan<char> input, out Message result)
+        => Parse(input, out result) == ParseStatus.Success;
 
     /// <inheritdoc/>
     public override string ToString()

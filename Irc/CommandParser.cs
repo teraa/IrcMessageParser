@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Teraa.Irc;
 
@@ -11,6 +12,7 @@ public static class CommandParser
 
     /// <inheritdoc cref="Parse(ReadOnlySpan{char})"/>
     /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Command Parse(string input)
     {
         if (input is null)
@@ -26,6 +28,7 @@ public static class CommandParser
     /// <param name="input">Input to parse.</param>
     /// <returns><see cref="Command"/>.</returns>
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Command Parse(ReadOnlySpan<char> input)
     {
         ParseStatus status = Parse(input, out Command result);
@@ -41,6 +44,22 @@ public static class CommandParser
 
         throw new FormatException(message);
     }
+
+    /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Command)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TryParse(string? input, out Command result)
+        => TryParse(input.AsSpan(), out result);
+
+    /// <summary>
+    ///     Parses the <see cref="Command"/> from <paramref name="input"/>.
+    ///     See <see href="https://datatracker.ietf.org/doc/html/rfc1459#section-2.3.1">RFC 1459 Section 2.3.1</see> for details.
+    /// </summary>
+    /// <param name="input">Input to parse.</param>
+    /// <param name="result">parsed command if method returns <see langword="true"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise, <see langword="false"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TryParse(ReadOnlySpan<char> input, out Command result)
+        => Parse(input, out result) == ParseStatus.Success;
 
     /// <summary>
     ///     Returns the <see cref="string"/> representation of the <see cref="Command"/>

@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace Teraa.Irc;
 
@@ -46,6 +47,7 @@ public record Content
 
     /// <inheritdoc cref="Parse(ReadOnlySpan{char})"/>
     /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Content Parse(string input)
     {
         if (input is null)
@@ -61,6 +63,7 @@ public record Content
     /// <param name="input">Content.</param>
     /// <returns><see cref="Content"/> instance parsed from <paramref name="input"/>.</returns>
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Content Parse(ReadOnlySpan<char> input)
     {
         ParseStatus status = Parse(input, out Content result);
@@ -76,6 +79,22 @@ public record Content
 
         throw new FormatException(message);
     }
+
+    /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Content)"/>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TryParse(string? input, out Content result)
+        => TryParse(input.AsSpan(), out result);
+
+    /// <summary>
+    ///     Parses the <paramref name="input"/> into an instance of <see cref="Content"/>.
+    ///     See <see href="https://tools.ietf.org/id/draft-oakley-irc-ctcp-01.html"/> for details.
+    /// </summary>
+    /// <param name="input">Input to parse.</param>
+    /// <param name="result">parsed content if method returns <see langword="true"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise, <see langword="false"/>.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TryParse(ReadOnlySpan<char> input, out Content result)
+        => Parse(input, out result) == ParseStatus.Success;
 
     /// <inheritdoc/>
     public override string ToString() => this;
