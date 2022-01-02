@@ -28,7 +28,6 @@ public class Tags : IReadOnlyDictionary<string, string>
 
     /// <inheritdoc cref="Parse(ReadOnlySpan{char})"/>
     /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Tags Parse(string input)
     {
         if (input is null)
@@ -43,7 +42,6 @@ public class Tags : IReadOnlyDictionary<string, string>
     /// </summary>
     /// <param name="input">Tags part of the IRC message.</param>
     /// <exception cref="FormatException"><paramref name="input"/> is empty.</exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Tags Parse(ReadOnlySpan<char> input)
     {
         ParseStatus status = Parse(input, out Tags result);
@@ -62,7 +60,6 @@ public class Tags : IReadOnlyDictionary<string, string>
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Tags)"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool TryParse(string? input, out Tags result)
         => TryParse(input.AsSpan(), out result);
 
@@ -73,7 +70,6 @@ public class Tags : IReadOnlyDictionary<string, string>
     /// <param name="input">Input to parse.</param>
     /// <param name="result">parsed tags if method returns <see langword="true"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise, <see langword="false"/>.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool TryParse(ReadOnlySpan<char> input, out Tags result)
         => Parse(input, out result) == ParseStatus.Success;
 

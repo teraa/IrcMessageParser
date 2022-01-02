@@ -39,7 +39,6 @@ public record Prefix
 
     /// <inheritdoc cref="Parse(ReadOnlySpan{char})"/>
     /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Prefix Parse(string input)
     {
         if (input is null)
@@ -55,7 +54,6 @@ public record Prefix
     /// <param name="input">Content.</param>
     /// <returns><see cref="Prefix"/> instance parsed from <paramref name="input"/>.</returns>
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Prefix Parse(ReadOnlySpan<char> input)
     {
         ParseStatus status = Parse(input, out Prefix result);
@@ -75,7 +73,6 @@ public record Prefix
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Prefix)"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool TryParse(string? input, out Prefix result)
         => TryParse(input.AsSpan(), out result);
 
@@ -86,7 +83,6 @@ public record Prefix
     /// <param name="input">Input to parse.</param>
     /// <param name="result">parsed prefix if method returns <see langword="true"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise, <see langword="false"/>.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool TryParse(ReadOnlySpan<char> input, out Prefix result)
         => Parse(input, out result) == ParseStatus.Success;
 

@@ -47,7 +47,6 @@ public record Content
 
     /// <inheritdoc cref="Parse(ReadOnlySpan{char})"/>
     /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Content Parse(string input)
     {
         if (input is null)
@@ -63,7 +62,6 @@ public record Content
     /// <param name="input">Content.</param>
     /// <returns><see cref="Content"/> instance parsed from <paramref name="input"/>.</returns>
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Content Parse(ReadOnlySpan<char> input)
     {
         ParseStatus status = Parse(input, out Content result);
@@ -81,7 +79,6 @@ public record Content
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Content)"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool TryParse(string? input, out Content result)
         => TryParse(input.AsSpan(), out result);
 
@@ -92,7 +89,6 @@ public record Content
     /// <param name="input">Input to parse.</param>
     /// <param name="result">parsed content if method returns <see langword="true"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise, <see langword="false"/>.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool TryParse(ReadOnlySpan<char> input, out Content result)
         => Parse(input, out result) == ParseStatus.Success;
 
