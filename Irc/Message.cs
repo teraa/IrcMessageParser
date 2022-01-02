@@ -110,7 +110,6 @@ public class Message
     internal static (ParseStatus status, int innerStatus) Parse(ReadOnlySpan<char> input, out Message result)
     {
         result = null!;
-        int innerStatus = 0;
 
         if (input.IsEmpty)
             return (ParseStatus.FailEmpty, 0);
@@ -132,9 +131,9 @@ public class Message
             if (i == -1)
                 return (ParseStatus.FailNoCommandMissingTagsEnding, 0);
 
-            innerStatus = (int)Tags.Parse(input[..i], out tags);
-            if (innerStatus != (int)Tags.ParseStatus.Success)
-                return (ParseStatus.FailTags, innerStatus);
+            var tagsStatus = Tags.Parse(input[..i], out tags);
+            if (tagsStatus != Tags.ParseStatus.Success)
+                return (ParseStatus.FailTags, (int)tagsStatus);
 
             input = input[(i + 1)..];
 
@@ -155,9 +154,9 @@ public class Message
             if (i == -1)
                 return (ParseStatus.FailNoCommandMissingPrefixEnding, 0);
 
-            innerStatus = (int)Prefix.Parse(input[..i], out prefix);
-            if (innerStatus != (int)Prefix.ParseStatus.Success)
-                return (ParseStatus.FailPrefix, innerStatus);
+            var prefixStatus = Prefix.Parse(input[..i], out prefix);
+            if (prefixStatus != Prefix.ParseStatus.Success)
+                return (ParseStatus.FailPrefix, (int)prefixStatus);
 
             input = input[(i + 1)..];
 
@@ -173,9 +172,9 @@ public class Message
         i = input.IndexOf(' ');
         if (i != -1)
         {
-            innerStatus = (int)CommandParser.Parse(input[..i], out command);
-            if (innerStatus != (int)CommandParser.ParseStatus.Success)
-                return (ParseStatus.FailCommand, innerStatus);
+            var commandStatus = CommandParser.Parse(input[..i], out command);
+            if (commandStatus != CommandParser.ParseStatus.Success)
+                return (ParseStatus.FailCommand, (int)commandStatus);
 
             input = input[(i + 1)..];
 
@@ -212,16 +211,16 @@ public class Message
             }
             else
             {
-                innerStatus = (int)Content.Parse(input, out content);
-                if (innerStatus != (int)Content.ParseStatus.Success)
-                    return (ParseStatus.FailContent, innerStatus);
+                var contentStatus = Content.Parse(input, out content);
+                if (contentStatus != Content.ParseStatus.Success)
+                    return (ParseStatus.FailContent, (int)contentStatus);
             }
         }
         else
         {
-            innerStatus = (int)CommandParser.Parse(input, out command);
-            if (innerStatus != (int)CommandParser.ParseStatus.Success)
-                return (ParseStatus.FailCommand, innerStatus);
+            var commandStatus = CommandParser.Parse(input, out command);
+            if (commandStatus != CommandParser.ParseStatus.Success)
+                return (ParseStatus.FailCommand, (int)commandStatus);
 
             arg = null;
             content = null;
