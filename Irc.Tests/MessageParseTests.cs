@@ -233,21 +233,21 @@ public class MessageParseTests
     }
 
     [Theory]
-    [InlineData("PING", ParseStatus.Success)]
-    [InlineData("", ParseStatus.FailEmpty)]
-    [InlineData("@ ", ParseStatus.FailTags)]
-    [InlineData(": ", ParseStatus.FailPrefix)]
-    [InlineData("0", ParseStatus.FailCommand)]
-    [InlineData("PING :\u0001ACTION", ParseStatus.FailContent)]
-    [InlineData("@tag", ParseStatus.FailNoCommandMissingTagsEnding)]
-    [InlineData("@tag ", ParseStatus.FailNoCommandAfterTagsEnding)]
-    [InlineData("@tag :name", ParseStatus.FailNoCommandMissingPrefixEnding)]
-    [InlineData("@tag :name ", ParseStatus.FailNoCommandAfterPrefixEnding)]
-    [InlineData("@tag :name PING ", ParseStatus.FailTrailingSpaceAfterCommand)]
-    internal void ParseStatusTest(string input, ParseStatus expectedStatus)
+    [InlineData("PING", ParseStatus.Success, 0)]
+    [InlineData("", ParseStatus.FailEmpty, 0)]
+    [InlineData("@ ", ParseStatus.FailTags, (int)Tags.ParseStatus.FailEmpty)]
+    [InlineData(": ", ParseStatus.FailPrefix, (int)Prefix.ParseStatus.FailEmpty)]
+    [InlineData("0", ParseStatus.FailCommand, (int)CommandParser.ParseStatus.FailFormat)]
+    [InlineData("PING :\u0001ACTION", ParseStatus.FailContent, (int)Content.ParseStatus.FailMissingCtcpEnding)]
+    [InlineData("@tag", ParseStatus.FailNoCommandMissingTagsEnding, 0)]
+    [InlineData("@tag ", ParseStatus.FailNoCommandAfterTagsEnding, 0)]
+    [InlineData("@tag :name", ParseStatus.FailNoCommandMissingPrefixEnding, 0)]
+    [InlineData("@tag :name ", ParseStatus.FailNoCommandAfterPrefixEnding, 0)]
+    [InlineData("@tag :name PING ", ParseStatus.FailTrailingSpaceAfterCommand, 0)]
+    internal void ParseStatusTest(string input, ParseStatus expectedStatus, int expectedInnerStatus)
     {
-        (var status, _) = Message.Parse(input, out _);
-        Assert.Equal(expectedStatus, status);
+        (ParseStatus status, int innerStatus) = Message.Parse(input, out _);
+        Assert.Equal((expectedStatus, expectedInnerStatus), (status, innerStatus));
 
         var success = Message.TryParse(input, out _);
         Assert.Equal(status is ParseStatus.Success, success);
