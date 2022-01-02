@@ -62,6 +62,9 @@ public record Content
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Content Parse(ReadOnlySpan<char> input)
     {
+        if (input.IsEmpty)
+            throw new FormatException("Input is empty");
+
         string? ctcp;
         if (input[0] == s_ctcpDelimiter)
         {

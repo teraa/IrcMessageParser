@@ -40,11 +40,11 @@ public class Tags : IReadOnlyDictionary<string, string>
     ///     See <see href="https://ircv3.net/specs/extensions/message-tags#format">IRCv3 spec</see> for details.
     /// </summary>
     /// <param name="input">Tags part of the IRC message.</param>
-    /// <exception cref="ArgumentException"><paramref name="input"/> is empty.</exception>
+    /// <exception cref="FormatException"><paramref name="input"/> is empty.</exception>
     public static Tags Parse(ReadOnlySpan<char> input)
     {
         if (input.IsEmpty)
-            throw new ArgumentException("Argument cannot be empty", nameof(input));
+            throw new FormatException("Input is empty");
 
         Dictionary<string, string> tags = new();
 
@@ -62,22 +62,28 @@ public class Tags : IReadOnlyDictionary<string, string>
             {
                 tag = input[..i];
                 input = input[(i + 1)..];
+
+                if (input.IsEmpty)
+                    throw new FormatException("Trailing semicolon");
             }
 
-            string key, value;
+            ReadOnlySpan<char> key, value;
             i = tag.IndexOf('=');
             if (i == -1)
             {
-                key = tag.ToString();
-                value = "";
+                key = tag;
+                value = default;
             }
             else
             {
-                key = tag[..i].ToString();
+                key = tag[..i];
                 value = ParseValue(tag[(i + 1)..]);
             }
 
-            tags[key] = value;
+            if (key.IsEmpty)
+                throw new FormatException("A tag key is empty");
+
+            tags[key.ToString()] = value.ToString();
 
         } while (!input.IsEmpty);
 

@@ -85,6 +85,7 @@ public class PrefixTests
     [InlineData("nick@")]
     [InlineData("!")]
     [InlineData("@")]
+    [InlineData("")]
     public void Parse_ThrowsFormatException(string input)
     {
         Assert.Throws<FormatException>(

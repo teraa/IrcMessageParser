@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 
 namespace Teraa.Irc.Tests;
@@ -7,7 +8,7 @@ public class TagsParseTests
     [Fact]
     public void MultipleTags()
     {
-        var tags = Tags.Parse("A;B=;C=c\\;D=d;");
+        var tags = Tags.Parse("A;B=;C=c\\;D=d");
 
         Assert.Collection(tags,
             tag =>
@@ -36,7 +37,7 @@ public class TagsParseTests
     [Fact]
     public void EqualsSignInValue_TreatedAsValue()
     {
-        var tags = Tags.Parse("key=value=value;");
+        var tags = Tags.Parse("key=value=value");
 
         Assert.Collection(tags,
             pair =>
@@ -64,7 +65,7 @@ public class TagsParseTests
     [Fact]
     public void TrailingSemicolon_Ignored()
     {
-        var tags = Tags.Parse("key=value;");
+        var tags = Tags.Parse("key=value");
 
         Assert.Collection(tags,
             pair =>
@@ -133,6 +134,18 @@ public class TagsParseTests
                 Assert.Equal("A", tag.Key);
                 Assert.Equal("", tag.Value);
             }
+        );
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(";")]
+    [InlineData("x;")]
+    [InlineData("x;;x")]
+    public void ThrowsFormatException(string input)
+    {
+        Assert.Throws<FormatException>(
+            () => Tags.Parse(input)
         );
     }
 }

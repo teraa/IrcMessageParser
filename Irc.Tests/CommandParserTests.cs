@@ -27,6 +27,7 @@ public class CommandParserTests
 
 
     [Theory]
+    [InlineData("")]
     [InlineData("1")]
     [InlineData("10")]
     [InlineData("1000")]

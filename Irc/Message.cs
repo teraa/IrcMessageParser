@@ -51,11 +51,10 @@ public class Message
     /// <param name="input">Raw IRC message.</param>
     /// <returns><see cref="Message"/> instance parsed from <paramref name="input"/>.</returns>
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
-    /// <exception cref="ArgumentException"><paramref name="input"/> is empty.</exception>
     public static Message Parse(ReadOnlySpan<char> input)
     {
         if (input.IsEmpty)
-            throw new ArgumentException("Argument cannot be empty", nameof(input));
+            throw new FormatException("Input is empty");
 
         Tags? tags;
         Prefix? prefix;
@@ -72,10 +71,13 @@ public class Message
             i = input.IndexOf(' ');
 
             if (i == -1)
-                throw new FormatException("Missing tags ending");
+                throw new FormatException("Missing command (no tags ending)");
 
             tags = Tags.Parse(input[..i]);
             input = input[(i + 1)..];
+
+            if (input.IsEmpty)
+                throw new FormatException("Missing command (nothing after tags ending)");
         }
         else
         {
@@ -89,10 +91,13 @@ public class Message
             i = input.IndexOf(' ');
 
             if (i == -1)
-                throw new FormatException("Missing prefix ending");
+                throw new FormatException("Missing command (no prefix ending)");
 
             prefix = Prefix.Parse(input[..i]);
             input = input[(i + 1)..];
+
+            if (input.IsEmpty)
+                throw new FormatException("Missing command (nothing after prefix ending)");
         }
         else
         {
@@ -105,6 +110,9 @@ public class Message
         {
             command = CommandParser.Parse(input[..i]);
             input = input[(i + 1)..];
+
+            if (input.IsEmpty)
+                throw new FormatException("Trailing space after command");
 
             // No Arg
             if (input[0] == ':')

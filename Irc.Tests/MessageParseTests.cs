@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using Xunit;
 
 namespace Teraa.Irc.Tests;
@@ -229,5 +229,21 @@ public class MessageParseTests
         Assert.Equal("#channel", message.Arg);
         Assert.NotNull(message.Content);
         Assert.Equal("message", message.Content!);
+    }
+
+    [Theory]
+    [InlineData("")] // empty message
+    [InlineData("@ ")] // empty tags
+    [InlineData(": ")] // empty prefix
+    [InlineData("@tag")] // no tags ending
+    [InlineData("@tag ")] // nothing after tags ending
+    [InlineData("@tag :name")] // no prefix ending
+    [InlineData("@tag :name ")] // nothing after prefix ending
+    [InlineData("@tag :name PING ")] // Trailing space after command
+    public void ThrowsFormatException(string input)
+    {
+        Assert.Throws<FormatException>(
+            () => Message.Parse(input)
+        );
     }
 }

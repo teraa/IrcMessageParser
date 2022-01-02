@@ -52,12 +52,11 @@ public record Prefix
     /// </summary>
     /// <param name="input">Content.</param>
     /// <returns><see cref="Prefix"/> instance parsed from <paramref name="input"/>.</returns>
-    /// <exception cref="ArgumentException"><paramref name="input"/> is empty.</exception>
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Prefix Parse(ReadOnlySpan<char> input)
     {
         if (input.IsEmpty)
-            throw new ArgumentException("Argument cannot be empty", nameof(input));
+            throw new FormatException("Input is empty");
 
         string name;
         string? user, host;
@@ -68,7 +67,7 @@ public record Prefix
         {
             var hostSpan = input[(i + 1)..];
             if (hostSpan.IsEmpty)
-                throw new FormatException("Host part of the prefix is empty.");
+                throw new FormatException("Host part of the prefix is empty");
 
             host = hostSpan.ToString();
             input = input[..i];
@@ -84,7 +83,7 @@ public record Prefix
         {
             var userSpan = input[(i + 1)..];
             if (userSpan.IsEmpty)
-                throw new FormatException("User part of the prefix is empty.");
+                throw new FormatException("User part of the prefix is empty");
 
             user = userSpan.ToString();
             input = input[..i];
@@ -95,7 +94,7 @@ public record Prefix
         }
 
         if (input.IsEmpty)
-            throw new FormatException("Name part of the prefix is empty.");
+            throw new FormatException("Name part of the prefix is empty");
 
         name = input.ToString();
 

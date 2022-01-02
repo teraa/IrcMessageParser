@@ -38,11 +38,13 @@ public class ContentTests
         Assert.Equal(raw + "\u0001", content);
     }
 
-    [Fact]
-    public void CtcpMissingEnding_ParseThrows()
+    [Theory]
+    [InlineData("")] // empty
+    [InlineData("\u0001ACTION")] // Missing CTCP ending
+    public void Parse_ThrowsFormatException(string input)
     {
         Assert.Throws<FormatException>(
-            () => Content.Parse("\u0001ACTION")
+            () => Content.Parse(input)
         );
     }
 

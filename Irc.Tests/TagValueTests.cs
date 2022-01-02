@@ -5,6 +5,10 @@ namespace Teraa.Irc.Tests;
 public class TagValueTests
 {
     [Theory]
+    // Normal
+    [InlineData(@"", @"")]
+    [InlineData(@"x", @"x")]
+    // Special
     [InlineData(@"\", @"\\")]
     [InlineData(";", @"\:")]
     [InlineData(" ", @"\s")]
@@ -18,6 +22,10 @@ public class TagValueTests
     }
 
     [Theory]
+    // Normal
+    [InlineData(@"", @"")]
+    [InlineData(@"x", @"x")]
+    // Special
     [InlineData(@"\\", @"\")]
     [InlineData(@"\:", ";")]
     [InlineData(@"\s", " ")]
