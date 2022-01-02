@@ -144,7 +144,7 @@ public class Message
     /// <inheritdoc/>
     public override string ToString()
     {
-        var result = new StringBuilder();
+        StringBuilder result = new();
 
         if (Tags is { Count: > 0 })
             result

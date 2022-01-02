@@ -36,7 +36,7 @@ public class Tags : IReadOnlyDictionary<string, string>
         if (input.IsEmpty)
             throw new ArgumentException("Argument cannot be empty", nameof(input));
 
-        var tags = new Dictionary<string, string>();
+        Dictionary<string, string> tags = new();
 
         int i;
         ReadOnlySpan<char> tag;
@@ -71,7 +71,7 @@ public class Tags : IReadOnlyDictionary<string, string>
 
         } while (!input.IsEmpty);
 
-        return new(tags);
+        return new Tags(tags);
     }
 
     /// <summary>
@@ -83,7 +83,7 @@ public class Tags : IReadOnlyDictionary<string, string>
     {
         if (input.IsEmpty) return "";
 
-        var result = new StringBuilder();
+        StringBuilder result = new();
         int i = 0;
         for (int j = 0; j < input.Length - 1; j++)
         {
@@ -92,8 +92,8 @@ public class Tags : IReadOnlyDictionary<string, string>
                 result.Append(input[i..j]);
 
                 j++;
-                var next = input[j];
-                var parsed = next switch
+                char next = input[j];
+                char parsed = next switch
                 {
                     '\\' => '\\',
                     ':' => ';',
@@ -122,11 +122,11 @@ public class Tags : IReadOnlyDictionary<string, string>
     {
         if (input.IsEmpty) return "";
 
-        var result = new StringBuilder();
+        StringBuilder result = new();
         int i = 0;
         for (int j = 0; j < input.Length; j++)
         {
-            var escaped = input[j] switch
+            string? escaped = input[j] switch
             {
                 '\\' => @"\\",
                 ';' => @"\:",
@@ -182,7 +182,7 @@ public class Tags : IReadOnlyDictionary<string, string>
     /// <inheritdoc/>
     public override string ToString()
     {
-        var result = new StringBuilder();
+        StringBuilder result = new();
 
         if (_tags is { Count: > 0 })
         {

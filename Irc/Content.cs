@@ -72,7 +72,7 @@ public record Content
             ctcp = null;
         }
 
-        var text = input.ToString();
+        string text = input.ToString();
 
         return new Content(text, ctcp);
     }
