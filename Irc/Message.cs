@@ -35,6 +35,16 @@ public class Message
     /// </summary>
     public Message() { }
 
+    /// <inheritdoc cref="Parse(ReadOnlySpan{char})"/>
+    /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
+    public static Message Parse(string input)
+    {
+        if (input is null)
+            throw new ArgumentNullException(nameof(input));
+
+        return Parse(input.AsSpan());
+    }
+
     /// <summary>
     ///     Parses the <paramref name="input"/> into an instance of <see cref="Message"/>.
     /// </summary>

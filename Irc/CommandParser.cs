@@ -9,6 +9,16 @@ public static class CommandParser
 {
     private const Command s_maxNumeric = (Command)999;
 
+    /// <inheritdoc cref="Parse(ReadOnlySpan{char})"/>
+    /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
+    public static Command Parse(string input)
+    {
+        if (input is null)
+            throw new ArgumentNullException(nameof(input));
+
+        return Parse(input.AsSpan());
+    }
+
     /// <summary>
     ///     Parses the <see cref="Command"/> from <paramref name="input"/>.
     ///     See <see href="https://datatracker.ietf.org/doc/html/rfc1459#section-2.3.1">RFC 1459 Section 2.3.1</see> for details.

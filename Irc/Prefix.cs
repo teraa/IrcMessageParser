@@ -36,6 +36,16 @@ public record Prefix
         Host = host;
     }
 
+    /// <inheritdoc cref="Parse(ReadOnlySpan{char})"/>
+    /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
+    public static Prefix Parse(string input)
+    {
+        if (input is null)
+            throw new ArgumentNullException(nameof(input));
+
+        return Parse(input.AsSpan());
+    }
+
     /// <summary>
     ///     Parses the <paramref name="input"/> into an instance of <see cref="Prefix"/>.
     ///     See <see href="https://datatracker.ietf.org/doc/html/rfc1459#section-2.3.1">RFC 1459 Section 2.3.1</see> for details.

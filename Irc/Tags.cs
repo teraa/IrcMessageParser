@@ -25,6 +25,16 @@ public class Tags : IReadOnlyDictionary<string, string>
     public static implicit operator Tags(Dictionary<string, string> tags)
         => new(tags);
 
+    /// <inheritdoc cref="Parse(ReadOnlySpan{char})"/>
+    /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
+    public static Tags Parse(string input)
+    {
+        if (input is null)
+            throw new ArgumentNullException(nameof(input));
+
+        return Parse(input.AsSpan());
+    }
+
     /// <summary>
     ///     Parses the tags from <paramref name="input"/>.
     ///     See <see href="https://ircv3.net/specs/extensions/message-tags#format">IRCv3 spec</see> for details.

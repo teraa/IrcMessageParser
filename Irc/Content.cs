@@ -43,6 +43,16 @@ public record Content
     public static explicit operator Content(string s)
         => Parse(s);
 
+    /// <inheritdoc cref="Parse(ReadOnlySpan{char})"/>
+    /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
+    public static Content Parse(string input)
+    {
+        if (input is null)
+            throw new ArgumentNullException(nameof(input));
+
+        return Parse(input.AsSpan());
+    }
+
     /// <summary>
     ///     Parses the <paramref name="input"/> into an instance of <see cref="Content"/>.
     ///     See <see href="https://tools.ietf.org/id/draft-oakley-irc-ctcp-01.html"/> for details.
