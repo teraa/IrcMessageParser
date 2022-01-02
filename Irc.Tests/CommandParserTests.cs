@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 using static Teraa.Irc.CommandParser;
 
@@ -52,5 +53,19 @@ public class CommandParserTests
     {
         var status = CommandParser.Parse(input, out _);
         Assert.Equal(expectedStatus, status);
+
+        var success = CommandParser.TryParse(input, out _);
+        Assert.Equal(status is ParseStatus.Success, success);
+
+        if (status is ParseStatus.Success)
+        {
+            _ = CommandParser.Parse(input);
+        }
+        else
+        {
+            Assert.Throws<FormatException>(
+                () => CommandParser.Parse(input)
+            );
+        }
     }
 }

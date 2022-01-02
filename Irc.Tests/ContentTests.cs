@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 using static Teraa.Irc.Content;
 
@@ -60,5 +61,19 @@ public class ContentTests
     {
         var status = Content.Parse(input, out _);
         Assert.Equal(expectedStatus, status);
+
+        var success = Content.TryParse(input, out _);
+        Assert.Equal(status is ParseStatus.Success, success);
+
+        if (status is ParseStatus.Success)
+        {
+            _ = Content.Parse(input);
+        }
+        else
+        {
+            Assert.Throws<FormatException>(
+                () => Content.Parse(input)
+            );
+        }
     }
 }

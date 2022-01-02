@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 using static Teraa.Irc.Prefix;
 
@@ -94,5 +95,19 @@ public class PrefixTests
     {
         var status = Prefix.Parse(input, out _);
         Assert.Equal(expectedStatus, status);
+
+        var success = Prefix.TryParse(input, out _);
+        Assert.Equal(status is ParseStatus.Success, success);
+
+        if (status is ParseStatus.Success)
+        {
+            _ = Prefix.Parse(input);
+        }
+        else
+        {
+            Assert.Throws<FormatException>(
+                () => Prefix.Parse(input)
+            );
+        }
     }
 }

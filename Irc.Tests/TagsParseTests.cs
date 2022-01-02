@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 using static Teraa.Irc.Tags;
 
@@ -147,5 +148,19 @@ public class TagsParseTests
     {
         var status = Tags.Parse(input, out _);
         Assert.Equal(expectedStatus, status);
+
+        var success = Tags.TryParse(input, out _);
+        Assert.Equal(status is ParseStatus.Success, success);
+
+        if (status is ParseStatus.Success)
+        {
+            _ = Tags.Parse(input);
+        }
+        else
+        {
+            Assert.Throws<FormatException>(
+                () => Tags.Parse(input)
+            );
+        }
     }
 }

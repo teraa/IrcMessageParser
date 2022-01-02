@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 using static Teraa.Irc.Message;
 
@@ -247,5 +248,19 @@ public class MessageParseTests
     {
         var status = Message.Parse(input, out _);
         Assert.Equal(expectedStatus, status);
+
+        var success = Message.TryParse(input, out _);
+        Assert.Equal(status is ParseStatus.Success, success);
+
+        if (status is ParseStatus.Success)
+        {
+            _ = Message.Parse(input);
+        }
+        else
+        {
+            Assert.Throws<FormatException>(
+                () => Message.Parse(input)
+            );
+        }
     }
 }
