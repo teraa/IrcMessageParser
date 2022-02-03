@@ -106,12 +106,14 @@ public class Message
         return result.ToString();
     }
 
-    internal static FailResult Parse(ReadOnlySpan<char> input, out Message result)
+    internal static FailResult Parse(ReadOnlySpan<char> input, out Message message)
     {
-        result = null!;
+        message = null!;
 
         if (input.IsEmpty)
             return FailResult.MessageEmpty;
+
+        FailResult result;
 
         Tags? tags;
         Prefix? prefix;
@@ -130,9 +132,8 @@ public class Message
             if (i == -1)
                 return FailResult.MessageNoCommandMissingTagsEnding;
 
-            var tagsResult = Tags.Parse(input[..i], out tags);
-            if (tagsResult != FailResult.None)
-                return tagsResult;
+            if ((result = Tags.Parse(input[..i], out tags)) != FailResult.None)
+                return result;
 
             input = input[(i + 1)..];
 
@@ -153,9 +154,8 @@ public class Message
             if (i == -1)
                 return FailResult.MessageNoCommandMissingPrefixEnding;
 
-            var prefixResult = Prefix.Parse(input[..i], out prefix);
-            if (prefixResult != FailResult.None)
-                return prefixResult;
+            if ((result = Prefix.Parse(input[..i], out prefix)) != FailResult.None)
+                return result;
 
             input = input[(i + 1)..];
 
@@ -171,9 +171,8 @@ public class Message
         i = input.IndexOf(' ');
         if (i != -1)
         {
-            var commandResult = CommandParser.Parse(input[..i], out command);
-            if (commandResult != FailResult.None)
-                return commandResult;
+            if ((result = CommandParser.Parse(input[..i], out command)) != FailResult.None)
+                return result;
 
             input = input[(i + 1)..];
 
@@ -210,22 +209,20 @@ public class Message
             }
             else
             {
-                var contentResult = Content.Parse(input, out content);
-                if (contentResult != FailResult.None)
-                    return contentResult;
+                if ((result = Content.Parse(input, out content)) != FailResult.None)
+                    return result;
             }
         }
         else
         {
-            var commandResult = CommandParser.Parse(input, out command);
-            if (commandResult != FailResult.None)
-                return commandResult;
+            if ((result = CommandParser.Parse(input, out command)) != FailResult.None)
+                return result;
 
             arg = null;
             content = null;
         }
 
-        result = new Message
+        message = new Message
         {
             Arg = arg,
             Command = command,
