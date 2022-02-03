@@ -32,7 +32,7 @@ internal enum FailResult
 internal static class FailResultExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string? FailResultToString(this FailResult value)
+    public static string FailResultToString(this FailResult value)
     {
         return value switch
         {
@@ -58,7 +58,7 @@ internal static class FailResultExtensions
             FailResult.MessageNoCommandAfterPrefixEnding => "Missing command (nothing after prefix ending)",
             FailResult.MessageTrailingSpaceAfterCommand => "Trailing space after command",
 
-            _ => null,
+            _ => value.ToString(),
         };
     }
 }
