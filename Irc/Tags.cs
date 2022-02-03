@@ -43,11 +43,11 @@ public class Tags : IReadOnlyDictionary<string, string>
     /// <exception cref="FormatException"><paramref name="input"/> is empty.</exception>
     public static Tags Parse(ReadOnlySpan<char> input)
     {
-        FailResult status = Parse(input, out Tags result);
-        if (status is FailResult.None)
-            return result;
+        FailResult result = Parse(input, out Tags tags);
+        if (result is FailResult.None)
+            return tags;
 
-        throw new FormatException(status.ReasonToString());
+        throw new FormatException(result.FailResultToString());
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Tags)"/>

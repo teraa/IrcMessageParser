@@ -90,15 +90,12 @@ public class PrefixTests
     [InlineData("!user", FailResult.PrefixEmptyName)]
     [InlineData("@host", FailResult.PrefixEmptyName)]
     [InlineData("!user@host", FailResult.PrefixEmptyName)]
-    internal void ParseStatusTest(string input, FailResult expectedStatus)
+    internal void ParseResultTest(string input, FailResult expectedResult)
     {
-        var status = Prefix.Parse(input, out _);
-        Assert.Equal(expectedStatus, status);
+        FailResult result = Prefix.Parse(input, out _);
+        Assert.Equal(expectedResult, result);
 
-        var success = Prefix.TryParse(input, out _);
-        Assert.Equal(status is FailResult.None, success);
-
-        if (status is FailResult.None)
+        if (result is FailResult.None)
         {
             _ = Prefix.Parse(input);
         }

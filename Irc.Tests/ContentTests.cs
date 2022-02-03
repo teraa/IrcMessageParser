@@ -56,15 +56,12 @@ public class ContentTests
     [InlineData("x", FailResult.None)]
     [InlineData("", FailResult.ContentEmpty)]
     [InlineData("\u0001ACTION", FailResult.ContentMissingCtcpEnding)]
-    internal void FailReasonsTest(string input, FailResult expectedStatus)
+    internal void ParseResultTest(string input, FailResult expectedResult)
     {
-        var status = Content.Parse(input, out _);
-        Assert.Equal(expectedStatus, status);
+        FailResult result = Content.Parse(input, out _);
+        Assert.Equal(expectedResult, result);
 
-        var success = Content.TryParse(input, out _);
-        Assert.Equal(status is FailResult.None, success);
-
-        if (status is FailResult.None)
+        if (result is FailResult.None)
         {
             _ = Content.Parse(input);
         }

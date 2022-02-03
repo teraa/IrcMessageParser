@@ -243,15 +243,12 @@ public class MessageParseTests
     [InlineData("@tag :name", FailResult.MessageNoCommandMissingPrefixEnding)]
     [InlineData("@tag :name ", FailResult.MessageNoCommandAfterPrefixEnding)]
     [InlineData("@tag :name PING ", FailResult.MessageTrailingSpaceAfterCommand)]
-    internal void ParseStatusTest(string input, FailResult expectedStatus)
+    internal void ParseResultTest(string input, FailResult expectedResult)
     {
-        FailResult status = Message.Parse(input, out _);
-        Assert.Equal(expectedStatus, status);
+        FailResult result = Message.Parse(input, out _);
+        Assert.Equal(expectedResult, result);
 
-        var success = Message.TryParse(input, out _);
-        Assert.Equal(status is FailResult.None, success);
-
-        if (status is FailResult.None)
+        if (result is FailResult.None)
         {
             _ = Message.Parse(input);
         }

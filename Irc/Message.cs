@@ -53,11 +53,11 @@ public class Message
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Message Parse(ReadOnlySpan<char> input)
     {
-        FailResult status = Parse(input, out Message result);
-        if (status == FailResult.None)
-            return result;
+        FailResult result = Parse(input, out Message message);
+        if (result == FailResult.None)
+            return message;
 
-        throw new FormatException(status.ReasonToString());
+        throw new FormatException(result.FailResultToString());
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Message)"/>
@@ -130,9 +130,9 @@ public class Message
             if (i == -1)
                 return FailResult.MessageNoCommandMissingTagsEnding;
 
-            var tagsStatus = Tags.Parse(input[..i], out tags);
-            if (tagsStatus != FailResult.None)
-                return tagsStatus;
+            var tagsResult = Tags.Parse(input[..i], out tags);
+            if (tagsResult != FailResult.None)
+                return tagsResult;
 
             input = input[(i + 1)..];
 
@@ -153,9 +153,9 @@ public class Message
             if (i == -1)
                 return FailResult.MessageNoCommandMissingPrefixEnding;
 
-            var prefixStatus = Prefix.Parse(input[..i], out prefix);
-            if (prefixStatus != FailResult.None)
-                return prefixStatus;
+            var prefixResult = Prefix.Parse(input[..i], out prefix);
+            if (prefixResult != FailResult.None)
+                return prefixResult;
 
             input = input[(i + 1)..];
 
@@ -171,9 +171,9 @@ public class Message
         i = input.IndexOf(' ');
         if (i != -1)
         {
-            var commandStatus = CommandParser.Parse(input[..i], out command);
-            if (commandStatus != FailResult.None)
-                return commandStatus;
+            var commandResult = CommandParser.Parse(input[..i], out command);
+            if (commandResult != FailResult.None)
+                return commandResult;
 
             input = input[(i + 1)..];
 
@@ -210,16 +210,16 @@ public class Message
             }
             else
             {
-                var contentStatus = Content.Parse(input, out content);
-                if (contentStatus != FailResult.None)
-                    return contentStatus;
+                var contentResult = Content.Parse(input, out content);
+                if (contentResult != FailResult.None)
+                    return contentResult;
             }
         }
         else
         {
-            var commandStatus = CommandParser.Parse(input, out command);
-            if (commandStatus != FailResult.None)
-                return commandStatus;
+            var commandResult = CommandParser.Parse(input, out command);
+            if (commandResult != FailResult.None)
+                return commandResult;
 
             arg = null;
             content = null;

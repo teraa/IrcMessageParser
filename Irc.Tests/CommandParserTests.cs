@@ -48,15 +48,12 @@ public class CommandParserTests
     [InlineData("-10", FailResult.CommandFormat)]
     [InlineData("-100", FailResult.CommandFormat)]
     [InlineData("invalid", FailResult.CommandFormat)]
-    internal void FailReasonsTest(string input, FailResult expectedStatus)
+    internal void ParseResultTest(string input, FailResult expectedResult)
     {
-        var status = CommandParser.Parse(input, out _);
-        Assert.Equal(expectedStatus, status);
+        FailResult result = CommandParser.Parse(input, out _);
+        Assert.Equal(expectedResult, result);
 
-        var success = CommandParser.TryParse(input, out _);
-        Assert.Equal(status is FailResult.None, success);
-
-        if (status is FailResult.None)
+        if (result is FailResult.None)
         {
             _ = CommandParser.Parse(input);
         }

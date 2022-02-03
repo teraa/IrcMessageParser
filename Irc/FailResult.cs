@@ -32,7 +32,7 @@ internal enum FailResult
 internal static class FailResultExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string? ReasonToString(this FailResult value)
+    public static string? FailResultToString(this FailResult value)
     {
         return value switch
         {

@@ -62,11 +62,11 @@ public record Content
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Content Parse(ReadOnlySpan<char> input)
     {
-        FailResult status = Parse(input, out Content result);
-        if (status is FailResult.None)
-            return result;
+        FailResult result = Parse(input, out Content content);
+        if (result is FailResult.None)
+            return content;
 
-        throw new FormatException(status.ReasonToString());
+        throw new FormatException(result.FailResultToString());
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Content)"/>
