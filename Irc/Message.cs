@@ -54,11 +54,11 @@ public class Message
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Message Parse(ReadOnlySpan<char> input)
     {
-        (ParseStatus status, int innerStatus) = Parse(input, out Message result);
-        if (status is ParseStatus.Success)
+        FailResult status = Parse(input, out Message result);
+        if (status == FailResult.None)
             return result;
 
-        throw new FormatException(ParseStatusToString(status, innerStatus));
+        throw new FormatException(status.ReasonToString());
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Message)"/>
@@ -72,7 +72,7 @@ public class Message
     /// <param name="result">parsed message if method returns <see langword="true"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise, <see langword="false"/>.</returns>
     public static bool TryParse(ReadOnlySpan<char> input, out Message result)
-        => Parse(input, out result).status == ParseStatus.Success;
+        => Parse(input, out result) == FailResult.None;
 
     /// <inheritdoc/>
     public override string ToString()
@@ -107,12 +107,12 @@ public class Message
         return result.ToString();
     }
 
-    internal static (ParseStatus status, int innerStatus) Parse(ReadOnlySpan<char> input, out Message result)
+    internal static FailResult Parse(ReadOnlySpan<char> input, out Message result)
     {
         result = null!;
 
         if (input.IsEmpty)
-            return (ParseStatus.FailEmpty, 0);
+            return FailResult.MessageEmpty;
 
         Tags? tags;
         Prefix? prefix;
@@ -129,16 +129,16 @@ public class Message
             i = input.IndexOf(' ');
 
             if (i == -1)
-                return (ParseStatus.FailNoCommandMissingTagsEnding, 0);
+                return FailResult.MessageNoCommandMissingTagsEnding;
 
             var tagsStatus = Tags.Parse(input[..i], out tags);
-            if (tagsStatus != Tags.ParseStatus.Success)
-                return (ParseStatus.FailTags, (int)tagsStatus);
+            if (tagsStatus != FailResult.None)
+                return tagsStatus;
 
             input = input[(i + 1)..];
 
             if (input.IsEmpty)
-                return (ParseStatus.FailNoCommandAfterTagsEnding, 0);
+                return FailResult.MessageNoCommandAfterTagsEnding;
         }
         else
         {
@@ -152,16 +152,16 @@ public class Message
             i = input.IndexOf(' ');
 
             if (i == -1)
-                return (ParseStatus.FailNoCommandMissingPrefixEnding, 0);
+                return FailResult.MessageNoCommandMissingPrefixEnding;
 
             var prefixStatus = Prefix.Parse(input[..i], out prefix);
-            if (prefixStatus != Prefix.ParseStatus.Success)
-                return (ParseStatus.FailPrefix, (int)prefixStatus);
+            if (prefixStatus != FailResult.None)
+                return prefixStatus;
 
             input = input[(i + 1)..];
 
             if (input.IsEmpty)
-                return (ParseStatus.FailNoCommandAfterPrefixEnding, 0);
+                return FailResult.MessageNoCommandAfterPrefixEnding;
         }
         else
         {
@@ -173,13 +173,13 @@ public class Message
         if (i != -1)
         {
             var commandStatus = CommandParser.Parse(input[..i], out command);
-            if (commandStatus != CommandParser.ParseStatus.Success)
-                return (ParseStatus.FailCommand, (int)commandStatus);
+            if (commandStatus != FailResult.None)
+                return commandStatus;
 
             input = input[(i + 1)..];
 
             if (input.IsEmpty)
-                return (ParseStatus.FailTrailingSpaceAfterCommand, 0);
+                return FailResult.MessageTrailingSpaceAfterCommand;
 
             // No Arg
             if (input[0] == ':')
@@ -212,15 +212,15 @@ public class Message
             else
             {
                 var contentStatus = Content.Parse(input, out content);
-                if (contentStatus != Content.ParseStatus.Success)
-                    return (ParseStatus.FailContent, (int)contentStatus);
+                if (contentStatus != FailResult.None)
+                    return contentStatus;
             }
         }
         else
         {
             var commandStatus = CommandParser.Parse(input, out command);
-            if (commandStatus != CommandParser.ParseStatus.Success)
-                return (ParseStatus.FailCommand, (int)commandStatus);
+            if (commandStatus != FailResult.None)
+                return commandStatus;
 
             arg = null;
             content = null;
@@ -235,40 +235,6 @@ public class Message
             Tags = tags
         };
 
-        return (ParseStatus.Success, 0);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static string? ParseStatusToString(ParseStatus status, int innerStatus)
-    {
-        return status switch
-        {
-            ParseStatus.FailEmpty => "Input is empty",
-            ParseStatus.FailTags => $"Tags: {Tags.ParseStatusToString((Tags.ParseStatus)innerStatus)}",
-            ParseStatus.FailPrefix => $"Prefix: {Prefix.ParseStatusToString((Prefix.ParseStatus)innerStatus)}",
-            ParseStatus.FailCommand => $"Command: {CommandParser.ParseStatusToString((CommandParser.ParseStatus)innerStatus)}",
-            ParseStatus.FailContent => $"Content: {Content.ParseStatusToString((Content.ParseStatus)innerStatus)}",
-            ParseStatus.FailNoCommandMissingTagsEnding => "Missing command (no tags ending)",
-            ParseStatus.FailNoCommandAfterTagsEnding => "Missing command (nothing after tags ending)",
-            ParseStatus.FailNoCommandMissingPrefixEnding => "Missing command (no prefix ending)",
-            ParseStatus.FailNoCommandAfterPrefixEnding => "Missing command (nothing after prefix ending)",
-            ParseStatus.FailTrailingSpaceAfterCommand => "Trailing space after command",
-            _ => null,
-        };
-    }
-
-    internal enum ParseStatus
-    {
-        Success,
-        FailEmpty,
-        FailTags,
-        FailPrefix,
-        FailCommand,
-        FailContent,
-        FailNoCommandMissingTagsEnding,
-        FailNoCommandAfterTagsEnding,
-        FailNoCommandMissingPrefixEnding,
-        FailNoCommandAfterPrefixEnding,
-        FailTrailingSpaceAfterCommand,
+        return FailResult.None;
     }
 }

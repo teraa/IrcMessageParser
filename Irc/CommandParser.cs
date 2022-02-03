@@ -29,11 +29,11 @@ public static class CommandParser
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Command Parse(ReadOnlySpan<char> input)
     {
-        ParseStatus status = Parse(input, out Command result);
-        if (status is ParseStatus.Success)
+        FailResult status = Parse(input, out Command result);
+        if (status is FailResult.None)
             return result;
 
-        throw new FormatException(ParseStatusToString(status));
+        throw new FormatException(status.ReasonToString());
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Command)"/>
@@ -48,7 +48,7 @@ public static class CommandParser
     /// <param name="result">parsed command if method returns <see langword="true"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise, <see langword="false"/>.</returns>
     public static bool TryParse(ReadOnlySpan<char> input, out Command result)
-        => Parse(input, out result) == ParseStatus.Success;
+        => Parse(input, out result) == FailResult.None;
 
     /// <summary>
     ///     Returns the <see cref="string"/> representation of the <see cref="Command"/>
@@ -63,40 +63,22 @@ public static class CommandParser
         return ((ushort)command).ToString("d3");
     }
 
-    internal static ParseStatus Parse(ReadOnlySpan<char> input, out Command result)
+    internal static FailResult Parse(ReadOnlySpan<char> input, out Command result)
     {
         result = 0;
 
         if (input.IsEmpty)
-            return ParseStatus.FailEmpty;
+            return FailResult.CommandEmpty;
 
         if (input.Length == 3 && ushort.TryParse(input, out var numeric))
             result = (Command)numeric;
         else if (Enum.TryParse<Command>(input, true, out var command)
             && command is > s_maxNumeric
             && (input[0] is (< '0' or > '9')))
-                result = command;
+            result = command;
         else
-            return ParseStatus.FailFormat;
+            return FailResult.CommandFormat;
 
-        return ParseStatus.Success;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static string? ParseStatusToString(ParseStatus status)
-    {
-        return status switch
-        {
-            ParseStatus.FailEmpty => "Input is empty",
-            ParseStatus.FailFormat => "Invalid format",
-            _ => null,
-        };
-    }
-
-    internal enum ParseStatus
-    {
-        Success,
-        FailEmpty,
-        FailFormat,
+        return FailResult.None;
     }
 }

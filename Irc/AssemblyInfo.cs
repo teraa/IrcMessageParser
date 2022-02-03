@@ -1,3 +1,3 @@
 using System.Runtime.CompilerServices;
 
-[assembly:InternalsVisibleTo("Teraa.Irc.Tests")]
+[assembly: InternalsVisibleTo("Teraa.Irc.Tests")]

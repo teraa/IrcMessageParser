@@ -56,11 +56,11 @@ public record Prefix
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Prefix Parse(ReadOnlySpan<char> input)
     {
-        ParseStatus status = Parse(input, out Prefix result);
-        if (status is ParseStatus.Success)
+        FailResult status = Parse(input, out Prefix result);
+        if (status is FailResult.None)
             return result;
 
-        throw new FormatException(ParseStatusToString(status));
+        throw new FormatException(status.ReasonToString());
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Prefix)"/>
@@ -75,7 +75,7 @@ public record Prefix
     /// <param name="result">parsed prefix if method returns <see langword="true"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise, <see langword="false"/>.</returns>
     public static bool TryParse(ReadOnlySpan<char> input, out Prefix result)
-        => Parse(input, out result) == ParseStatus.Success;
+        => Parse(input, out result) == FailResult.None;
 
     /// <inheritdoc/>
     public override string ToString()
@@ -89,12 +89,12 @@ public record Prefix
         };
     }
 
-    internal static ParseStatus Parse(ReadOnlySpan<char> input, out Prefix result)
+    internal static FailResult Parse(ReadOnlySpan<char> input, out Prefix result)
     {
         result = null!;
 
         if (input.IsEmpty)
-            return ParseStatus.FailEmpty;
+            return FailResult.PrefixEmpty;
 
         string name;
         string? user, host;
@@ -105,7 +105,7 @@ public record Prefix
         {
             var hostSpan = input[(i + 1)..];
             if (hostSpan.IsEmpty)
-                return ParseStatus.FailEmptyHost;
+                return FailResult.PrefixEmptyHost;
 
             host = hostSpan.ToString();
             input = input[..i];
@@ -121,7 +121,7 @@ public record Prefix
         {
             var userSpan = input[(i + 1)..];
             if (userSpan.IsEmpty)
-                return ParseStatus.FailEmptyUser;
+                return FailResult.PrefixEmptyUser;
 
             user = userSpan.ToString();
             input = input[..i];
@@ -132,34 +132,12 @@ public record Prefix
         }
 
         if (input.IsEmpty)
-            return ParseStatus.FailEmptyName;
+            return FailResult.PrefixEmptyName;
 
         name = input.ToString();
 
         result = new Prefix(name, user, host);
 
-        return ParseStatus.Success;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static string? ParseStatusToString(ParseStatus status)
-    {
-        return status switch
-        {
-            ParseStatus.FailEmpty => "Input is empty",
-            ParseStatus.FailEmptyHost => "Host is empty",
-            ParseStatus.FailEmptyUser => "User is empty",
-            ParseStatus.FailEmptyName => "Name is empty",
-            _ => null,
-        };
-    }
-
-    internal enum ParseStatus
-    {
-        Success,
-        FailEmpty,
-        FailEmptyHost,
-        FailEmptyUser,
-        FailEmptyName,
+        return FailResult.None;
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using Xunit;
-using static Teraa.Irc.Content;
 
 namespace Teraa.Irc.Tests;
 
@@ -54,18 +53,18 @@ public class ContentTests
     }
 
     [Theory]
-    [InlineData("x", ParseStatus.Success)]
-    [InlineData("", ParseStatus.FailEmpty)]
-    [InlineData("\u0001ACTION", ParseStatus.FailMissingCtcpEnding)]
-    internal void ParseStatusTest(string input, ParseStatus expectedStatus)
+    [InlineData("x", FailResult.None)]
+    [InlineData("", FailResult.ContentEmpty)]
+    [InlineData("\u0001ACTION", FailResult.ContentMissingCtcpEnding)]
+    internal void FailReasonsTest(string input, FailResult expectedStatus)
     {
         var status = Content.Parse(input, out _);
         Assert.Equal(expectedStatus, status);
 
         var success = Content.TryParse(input, out _);
-        Assert.Equal(status is ParseStatus.Success, success);
+        Assert.Equal(status is FailResult.None, success);
 
-        if (status is ParseStatus.Success)
+        if (status is FailResult.None)
         {
             _ = Content.Parse(input);
         }

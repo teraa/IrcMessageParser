@@ -1,6 +1,5 @@
 using System;
 using Xunit;
-using static Teraa.Irc.CommandParser;
 
 namespace Teraa.Irc.Tests;
 
@@ -41,23 +40,23 @@ public class CommandParserTests
     }
 
     [Theory]
-    [InlineData("100", ParseStatus.Success)]
-    [InlineData("", ParseStatus.FailEmpty)]
-    [InlineData("1", ParseStatus.FailFormat)]
-    [InlineData("10", ParseStatus.FailFormat)]
-    [InlineData("1000", ParseStatus.FailFormat)]
-    [InlineData("-10", ParseStatus.FailFormat)]
-    [InlineData("-100", ParseStatus.FailFormat)]
-    [InlineData("invalid", ParseStatus.FailFormat)]
-    internal void ParseStatusTest(string input, ParseStatus expectedStatus)
+    [InlineData("100", FailResult.None)]
+    [InlineData("", FailResult.CommandEmpty)]
+    [InlineData("1", FailResult.CommandFormat)]
+    [InlineData("10", FailResult.CommandFormat)]
+    [InlineData("1000", FailResult.CommandFormat)]
+    [InlineData("-10", FailResult.CommandFormat)]
+    [InlineData("-100", FailResult.CommandFormat)]
+    [InlineData("invalid", FailResult.CommandFormat)]
+    internal void FailReasonsTest(string input, FailResult expectedStatus)
     {
         var status = CommandParser.Parse(input, out _);
         Assert.Equal(expectedStatus, status);
 
         var success = CommandParser.TryParse(input, out _);
-        Assert.Equal(status is ParseStatus.Success, success);
+        Assert.Equal(status is FailResult.None, success);
 
-        if (status is ParseStatus.Success)
+        if (status is FailResult.None)
         {
             _ = CommandParser.Parse(input);
         }

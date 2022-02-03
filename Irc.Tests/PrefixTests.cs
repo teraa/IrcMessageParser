@@ -1,6 +1,5 @@
 using System;
 using Xunit;
-using static Teraa.Irc.Prefix;
 
 namespace Teraa.Irc.Tests;
 
@@ -79,27 +78,27 @@ public class PrefixTests
     }
 
     [Theory]
-    [InlineData("nick!user@host", ParseStatus.Success)]
-    [InlineData("nick!@host", ParseStatus.FailEmptyUser)]
-    [InlineData("nick!user@", ParseStatus.FailEmptyHost)]
-    [InlineData("nick!@", ParseStatus.FailEmptyHost)]
-    [InlineData("nick!", ParseStatus.FailEmptyUser)]
-    [InlineData("nick@", ParseStatus.FailEmptyHost)]
-    [InlineData("!", ParseStatus.FailEmptyUser)]
-    [InlineData("@", ParseStatus.FailEmptyHost)]
-    [InlineData("", ParseStatus.FailEmpty)]
-    [InlineData("!user", ParseStatus.FailEmptyName)]
-    [InlineData("@host", ParseStatus.FailEmptyName)]
-    [InlineData("!user@host", ParseStatus.FailEmptyName)]
-    internal void ParseStatusTest(string input, ParseStatus expectedStatus)
+    [InlineData("nick!user@host", FailResult.None)]
+    [InlineData("nick!@host", FailResult.PrefixEmptyUser)]
+    [InlineData("nick!user@", FailResult.PrefixEmptyHost)]
+    [InlineData("nick!@", FailResult.PrefixEmptyHost)]
+    [InlineData("nick!", FailResult.PrefixEmptyUser)]
+    [InlineData("nick@", FailResult.PrefixEmptyHost)]
+    [InlineData("!", FailResult.PrefixEmptyUser)]
+    [InlineData("@", FailResult.PrefixEmptyHost)]
+    [InlineData("", FailResult.PrefixEmpty)]
+    [InlineData("!user", FailResult.PrefixEmptyName)]
+    [InlineData("@host", FailResult.PrefixEmptyName)]
+    [InlineData("!user@host", FailResult.PrefixEmptyName)]
+    internal void ParseStatusTest(string input, FailResult expectedStatus)
     {
         var status = Prefix.Parse(input, out _);
         Assert.Equal(expectedStatus, status);
 
         var success = Prefix.TryParse(input, out _);
-        Assert.Equal(status is ParseStatus.Success, success);
+        Assert.Equal(status is FailResult.None, success);
 
-        if (status is ParseStatus.Success)
+        if (status is FailResult.None)
         {
             _ = Prefix.Parse(input);
         }

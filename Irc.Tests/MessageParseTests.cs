@@ -1,6 +1,5 @@
 using System;
 using Xunit;
-using static Teraa.Irc.Message;
 
 namespace Teraa.Irc.Tests;
 
@@ -233,26 +232,26 @@ public class MessageParseTests
     }
 
     [Theory]
-    [InlineData("PING", ParseStatus.Success, 0)]
-    [InlineData("", ParseStatus.FailEmpty, 0)]
-    [InlineData("@ ", ParseStatus.FailTags, (int)Tags.ParseStatus.FailEmpty)]
-    [InlineData(": ", ParseStatus.FailPrefix, (int)Prefix.ParseStatus.FailEmpty)]
-    [InlineData("0", ParseStatus.FailCommand, (int)CommandParser.ParseStatus.FailFormat)]
-    [InlineData("PING :\u0001ACTION", ParseStatus.FailContent, (int)Content.ParseStatus.FailMissingCtcpEnding)]
-    [InlineData("@tag", ParseStatus.FailNoCommandMissingTagsEnding, 0)]
-    [InlineData("@tag ", ParseStatus.FailNoCommandAfterTagsEnding, 0)]
-    [InlineData("@tag :name", ParseStatus.FailNoCommandMissingPrefixEnding, 0)]
-    [InlineData("@tag :name ", ParseStatus.FailNoCommandAfterPrefixEnding, 0)]
-    [InlineData("@tag :name PING ", ParseStatus.FailTrailingSpaceAfterCommand, 0)]
-    internal void ParseStatusTest(string input, ParseStatus expectedStatus, int expectedInnerStatus)
+    [InlineData("PING", FailResult.None)]
+    [InlineData("", FailResult.MessageEmpty)]
+    [InlineData("@ ", FailResult.TagsEmpty)]
+    [InlineData(": ", FailResult.PrefixEmpty)]
+    [InlineData("0", FailResult.CommandFormat)]
+    [InlineData("PING :\u0001ACTION", FailResult.ContentMissingCtcpEnding)]
+    [InlineData("@tag", FailResult.MessageNoCommandMissingTagsEnding)]
+    [InlineData("@tag ", FailResult.MessageNoCommandAfterTagsEnding)]
+    [InlineData("@tag :name", FailResult.MessageNoCommandMissingPrefixEnding)]
+    [InlineData("@tag :name ", FailResult.MessageNoCommandAfterPrefixEnding)]
+    [InlineData("@tag :name PING ", FailResult.MessageTrailingSpaceAfterCommand)]
+    internal void ParseStatusTest(string input, FailResult expectedStatus)
     {
-        (ParseStatus status, int innerStatus) = Message.Parse(input, out _);
-        Assert.Equal((expectedStatus, expectedInnerStatus), (status, innerStatus));
+        FailResult status = Message.Parse(input, out _);
+        Assert.Equal(expectedStatus, status);
 
         var success = Message.TryParse(input, out _);
-        Assert.Equal(status is ParseStatus.Success, success);
+        Assert.Equal(status is FailResult.None, success);
 
-        if (status is ParseStatus.Success)
+        if (status is FailResult.None)
         {
             _ = Message.Parse(input);
         }

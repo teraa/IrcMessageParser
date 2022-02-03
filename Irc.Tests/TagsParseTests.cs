@@ -1,6 +1,5 @@
 using System;
 using Xunit;
-using static Teraa.Irc.Tags;
 
 namespace Teraa.Irc.Tests;
 
@@ -139,20 +138,20 @@ public class TagsParseTests
     }
 
     [Theory]
-    [InlineData("x", ParseStatus.Success)]
-    [InlineData("", ParseStatus.FailEmpty)]
-    [InlineData(";", ParseStatus.FailTrailingSemicolon)]
-    [InlineData("x;", ParseStatus.FailTrailingSemicolon)]
-    [InlineData("x;;x", ParseStatus.FailKeyEmpty)]
-    internal void ParseStatusTest(string input, ParseStatus expectedStatus)
+    [InlineData("x", FailResult.None)]
+    [InlineData("", FailResult.TagsEmpty)]
+    [InlineData(";", FailResult.TagsTrailingSemicolon)]
+    [InlineData("x;", FailResult.TagsTrailingSemicolon)]
+    [InlineData("x;;x", FailResult.TagsKeyEmpty)]
+    internal void ParseStatusTest(string input, FailResult expectedStatus)
     {
         var status = Tags.Parse(input, out _);
         Assert.Equal(expectedStatus, status);
 
         var success = Tags.TryParse(input, out _);
-        Assert.Equal(status is ParseStatus.Success, success);
+        Assert.Equal(status is FailResult.None, success);
 
-        if (status is ParseStatus.Success)
+        if (status is FailResult.None)
         {
             _ = Tags.Parse(input);
         }

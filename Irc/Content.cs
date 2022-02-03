@@ -64,11 +64,11 @@ public record Content
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Content Parse(ReadOnlySpan<char> input)
     {
-        ParseStatus status = Parse(input, out Content result);
-        if (status is ParseStatus.Success)
+        FailResult status = Parse(input, out Content result);
+        if (status is FailResult.None)
             return result;
 
-        throw new FormatException(ParseStatusToString(status));
+        throw new FormatException(status.ReasonToString());
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Content)"/>
@@ -83,17 +83,17 @@ public record Content
     /// <param name="result">parsed content if method returns <see langword="true"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise, <see langword="false"/>.</returns>
     public static bool TryParse(ReadOnlySpan<char> input, out Content result)
-        => Parse(input, out result) == ParseStatus.Success;
+        => Parse(input, out result) == FailResult.None;
 
     /// <inheritdoc/>
     public override string ToString() => this;
 
-    internal static ParseStatus Parse(ReadOnlySpan<char> input, out Content result)
+    internal static FailResult Parse(ReadOnlySpan<char> input, out Content result)
     {
         result = null!;
 
         if (input.IsEmpty)
-            return ParseStatus.FailEmpty;
+            return FailResult.ContentEmpty;
 
         string? ctcp;
         if (input[0] == s_ctcpDelimiter)
@@ -105,7 +105,7 @@ public record Content
             int i = input.IndexOf(' ');
 
             if (i == -1)
-                return ParseStatus.FailMissingCtcpEnding;
+                return FailResult.ContentMissingCtcpEnding;
 
             ctcp = input[..i].ToString();
             input = input[(i + 1)..];
@@ -119,24 +119,6 @@ public record Content
 
         result = new Content(text, ctcp);
 
-        return ParseStatus.Success;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static string? ParseStatusToString(ParseStatus status)
-    {
-        return status switch
-        {
-            ParseStatus.FailEmpty => "Input is empty",
-            ParseStatus.FailMissingCtcpEnding => "Missing CTCP ending",
-            _ => null,
-        };
-    }
-
-    internal enum ParseStatus
-    {
-        Success,
-        FailEmpty,
-        FailMissingCtcpEnding,
+        return FailResult.None;
     }
 }

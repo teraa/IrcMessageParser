@@ -44,11 +44,11 @@ public class Tags : IReadOnlyDictionary<string, string>
     /// <exception cref="FormatException"><paramref name="input"/> is empty.</exception>
     public static Tags Parse(ReadOnlySpan<char> input)
     {
-        ParseStatus status = Parse(input, out Tags result);
-        if (status is ParseStatus.Success)
+        FailResult status = Parse(input, out Tags result);
+        if (status is FailResult.None)
             return result;
 
-        throw new FormatException(ParseStatusToString(status));
+        throw new FormatException(status.ReasonToString());
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Tags)"/>
@@ -63,7 +63,7 @@ public class Tags : IReadOnlyDictionary<string, string>
     /// <param name="result">parsed tags if method returns <see langword="true"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise, <see langword="false"/>.</returns>
     public static bool TryParse(ReadOnlySpan<char> input, out Tags result)
-        => Parse(input, out result) == ParseStatus.Success;
+        => Parse(input, out result) == FailResult.None;
 
     /// <summary>
     ///     Parses the input as described in the <see href="https://ircv3.net/specs/extensions/message-tags#escaping-values">IRCv3 spec</see>.
@@ -199,12 +199,12 @@ public class Tags : IReadOnlyDictionary<string, string>
     IEnumerator IEnumerable.GetEnumerator()
         => _tags.GetEnumerator();
 
-    internal static ParseStatus Parse(ReadOnlySpan<char> input, out Tags result)
+    internal static FailResult Parse(ReadOnlySpan<char> input, out Tags result)
     {
         result = null!;
 
         if (input.IsEmpty)
-            return ParseStatus.FailEmpty;
+            return FailResult.TagsEmpty;
 
         Dictionary<string, string> tags = new();
 
@@ -224,7 +224,7 @@ public class Tags : IReadOnlyDictionary<string, string>
                 input = input[(i + 1)..];
 
                 if (input.IsEmpty)
-                    return ParseStatus.FailTrailingSemicolon;
+                    return FailResult.TagsTrailingSemicolon;
             }
 
             ReadOnlySpan<char> key, value;
@@ -241,7 +241,7 @@ public class Tags : IReadOnlyDictionary<string, string>
             }
 
             if (key.IsEmpty)
-                return ParseStatus.FailKeyEmpty;
+                return FailResult.TagsKeyEmpty;
 
             tags[key.ToString()] = value.ToString();
 
@@ -249,26 +249,6 @@ public class Tags : IReadOnlyDictionary<string, string>
 
         result = new Tags(tags);
 
-        return ParseStatus.Success;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static string? ParseStatusToString(ParseStatus status)
-    {
-        return status switch
-        {
-            ParseStatus.FailEmpty => "Input is empty",
-            ParseStatus.FailTrailingSemicolon => "Trailing semicolon",
-            ParseStatus.FailKeyEmpty => "A tag key is empty",
-            _ => null,
-        };
-    }
-
-    internal enum ParseStatus
-    {
-        Success,
-        FailEmpty,
-        FailTrailingSemicolon,
-        FailKeyEmpty,
+        return FailResult.None;
     }
 }
