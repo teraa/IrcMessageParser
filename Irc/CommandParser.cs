@@ -28,11 +28,11 @@ public static class CommandParser
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Command Parse(ReadOnlySpan<char> input)
     {
-        FailResult result = Parse(input, out Command command);
-        if (result is FailResult.None)
-            return command;
+        FailResult failResult = Parse(input, out Command result);
+        if (failResult is FailResult.None)
+            return result;
 
-        throw new FormatException(result.FailResultToString());
+        throw new FormatException(failResult.FailResultToString());
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Command)"/>

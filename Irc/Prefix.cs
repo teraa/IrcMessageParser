@@ -55,11 +55,11 @@ public record Prefix
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Prefix Parse(ReadOnlySpan<char> input)
     {
-        FailResult result = Parse(input, out Prefix prefix);
-        if (result is FailResult.None)
-            return prefix;
+        FailResult failResult = Parse(input, out Prefix result);
+        if (failResult is FailResult.None)
+            return result;
 
-        throw new FormatException(result.FailResultToString());
+        throw new FormatException(failResult.FailResultToString());
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Prefix)"/>

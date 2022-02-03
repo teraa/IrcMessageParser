@@ -53,11 +53,11 @@ public class Message
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Message Parse(ReadOnlySpan<char> input)
     {
-        FailResult result = Parse(input, out Message message);
-        if (result == FailResult.None)
-            return message;
+        FailResult failResult = Parse(input, out Message result);
+        if (failResult == FailResult.None)
+            return result;
 
-        throw new FormatException(result.FailResultToString());
+        throw new FormatException(failResult.FailResultToString());
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Message)"/>
@@ -106,14 +106,14 @@ public class Message
         return result.ToString();
     }
 
-    internal static FailResult Parse(ReadOnlySpan<char> input, out Message message)
+    internal static FailResult Parse(ReadOnlySpan<char> input, out Message result)
     {
-        message = null!;
+        result = null!;
 
         if (input.IsEmpty)
             return FailResult.MessageEmpty;
 
-        FailResult result;
+        FailResult failResult;
 
         Tags? tags;
         Prefix? prefix;
@@ -132,8 +132,8 @@ public class Message
             if (i == -1)
                 return FailResult.MessageNoCommandMissingTagsEnding;
 
-            if ((result = Tags.Parse(input[..i], out tags)) != FailResult.None)
-                return result;
+            if ((failResult = Tags.Parse(input[..i], out tags)) != FailResult.None)
+                return failResult;
 
             input = input[(i + 1)..];
 
@@ -154,8 +154,8 @@ public class Message
             if (i == -1)
                 return FailResult.MessageNoCommandMissingPrefixEnding;
 
-            if ((result = Prefix.Parse(input[..i], out prefix)) != FailResult.None)
-                return result;
+            if ((failResult = Prefix.Parse(input[..i], out prefix)) != FailResult.None)
+                return failResult;
 
             input = input[(i + 1)..];
 
@@ -171,8 +171,8 @@ public class Message
         i = input.IndexOf(' ');
         if (i != -1)
         {
-            if ((result = CommandParser.Parse(input[..i], out command)) != FailResult.None)
-                return result;
+            if ((failResult = CommandParser.Parse(input[..i], out command)) != FailResult.None)
+                return failResult;
 
             input = input[(i + 1)..];
 
@@ -209,20 +209,20 @@ public class Message
             }
             else
             {
-                if ((result = Content.Parse(input, out content)) != FailResult.None)
-                    return result;
+                if ((failResult = Content.Parse(input, out content)) != FailResult.None)
+                    return failResult;
             }
         }
         else
         {
-            if ((result = CommandParser.Parse(input, out command)) != FailResult.None)
-                return result;
+            if ((failResult = CommandParser.Parse(input, out command)) != FailResult.None)
+                return failResult;
 
             arg = null;
             content = null;
         }
 
-        message = new Message
+        result = new Message
         {
             Arg = arg,
             Command = command,
