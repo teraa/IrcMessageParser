@@ -69,9 +69,9 @@ public static class CommandParser
         if (input.IsEmpty)
             return FailResult.CommandEmpty;
 
-        if (input.Length == 3 && ushort.TryParse(input, out var numeric))
+        if (input.Length == 3 && ushort.TryParse(input, out ushort numeric))
             result = (Command)numeric;
-        else if (Enum.TryParse<Command>(input, true, out var command)
+        else if (Enum.TryParse(input, true, out Command command)
             && command is > s_maxNumeric
             && (input[0] is (< '0' or > '9')))
             result = command;

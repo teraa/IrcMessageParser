@@ -176,7 +176,7 @@ public class Tags : IReadOnlyDictionary<string, string>
 
         if (_tags is { Count: > 0 })
         {
-            foreach (var (key, value) in _tags)
+            foreach ((string key, string value) in _tags)
             {
                 result.Append(key);
 

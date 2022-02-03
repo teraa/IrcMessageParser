@@ -102,7 +102,8 @@ public record Prefix
 
         if (i != -1)
         {
-            var hostSpan = input[(i + 1)..];
+            ReadOnlySpan<char> hostSpan = input[(i + 1)..];
+
             if (hostSpan.IsEmpty)
                 return FailResult.PrefixEmptyHost;
 
@@ -118,7 +119,8 @@ public record Prefix
 
         if (i != -1)
         {
-            var userSpan = input[(i + 1)..];
+            ReadOnlySpan<char> userSpan = input[(i + 1)..];
+
             if (userSpan.IsEmpty)
                 return FailResult.PrefixEmptyUser;
 
