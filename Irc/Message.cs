@@ -53,11 +53,11 @@ public class Message
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Message Parse(ReadOnlySpan<char> input)
     {
-        FailResult failResult = Parse(input, out Message result);
-        if (failResult == FailResult.None)
+        ParseResult parseResult = Parse(input, out Message result);
+        if (parseResult == ParseResult.Success)
             return result;
 
-        throw new FormatException(failResult.FailResultToString());
+        throw new FormatException(parseResult.ParseResultToString());
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Message)"/>
@@ -71,7 +71,7 @@ public class Message
     /// <param name="result">parsed message if method returns <see langword="true"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise, <see langword="false"/>.</returns>
     public static bool TryParse(ReadOnlySpan<char> input, out Message result)
-        => Parse(input, out result) == FailResult.None;
+        => Parse(input, out result) == ParseResult.Success;
 
     /// <inheritdoc/>
     public override string ToString()
@@ -106,14 +106,14 @@ public class Message
         return result.ToString();
     }
 
-    internal static FailResult Parse(ReadOnlySpan<char> input, out Message result)
+    internal static ParseResult Parse(ReadOnlySpan<char> input, out Message result)
     {
         result = null!;
 
         if (input.IsEmpty)
-            return FailResult.MessageEmpty;
+            return ParseResult.MessageEmpty;
 
-        FailResult failResult;
+        ParseResult parseResult;
 
         Tags? tags;
         Prefix? prefix;
@@ -130,15 +130,15 @@ public class Message
             i = input.IndexOf(' ');
 
             if (i == -1)
-                return FailResult.MessageNoCommandMissingTagsEnding;
+                return ParseResult.MessageNoCommandMissingTagsEnding;
 
-            if ((failResult = Tags.Parse(input[..i], out tags)) != FailResult.None)
-                return failResult;
+            if ((parseResult = Tags.Parse(input[..i], out tags)) != ParseResult.Success)
+                return parseResult;
 
             input = input[(i + 1)..];
 
             if (input.IsEmpty)
-                return FailResult.MessageNoCommandAfterTagsEnding;
+                return ParseResult.MessageNoCommandAfterTagsEnding;
         }
         else
         {
@@ -152,15 +152,15 @@ public class Message
             i = input.IndexOf(' ');
 
             if (i == -1)
-                return FailResult.MessageNoCommandMissingPrefixEnding;
+                return ParseResult.MessageNoCommandMissingPrefixEnding;
 
-            if ((failResult = Prefix.Parse(input[..i], out prefix)) != FailResult.None)
-                return failResult;
+            if ((parseResult = Prefix.Parse(input[..i], out prefix)) != ParseResult.Success)
+                return parseResult;
 
             input = input[(i + 1)..];
 
             if (input.IsEmpty)
-                return FailResult.MessageNoCommandAfterPrefixEnding;
+                return ParseResult.MessageNoCommandAfterPrefixEnding;
         }
         else
         {
@@ -171,13 +171,13 @@ public class Message
         i = input.IndexOf(' ');
         if (i != -1)
         {
-            if ((failResult = CommandParser.Parse(input[..i], out command)) != FailResult.None)
-                return failResult;
+            if ((parseResult = CommandParser.Parse(input[..i], out command)) != ParseResult.Success)
+                return parseResult;
 
             input = input[(i + 1)..];
 
             if (input.IsEmpty)
-                return FailResult.MessageTrailingSpaceAfterCommand;
+                return ParseResult.MessageTrailingSpaceAfterCommand;
 
             // No Arg
             if (input[0] == ':')
@@ -209,14 +209,14 @@ public class Message
             }
             else
             {
-                if ((failResult = Content.Parse(input, out content)) != FailResult.None)
-                    return failResult;
+                if ((parseResult = Content.Parse(input, out content)) != ParseResult.Success)
+                    return parseResult;
             }
         }
         else
         {
-            if ((failResult = CommandParser.Parse(input, out command)) != FailResult.None)
-                return failResult;
+            if ((parseResult = CommandParser.Parse(input, out command)) != ParseResult.Success)
+                return parseResult;
 
             arg = null;
             content = null;
@@ -231,6 +231,6 @@ public class Message
             Tags = tags
         };
 
-        return FailResult.None;
+        return ParseResult.Success;
     }
 }

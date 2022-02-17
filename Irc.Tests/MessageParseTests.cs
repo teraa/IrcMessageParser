@@ -232,23 +232,23 @@ public class MessageParseTests
     }
 
     [Theory]
-    [InlineData("PING", FailResult.None)]
-    [InlineData("", FailResult.MessageEmpty)]
-    [InlineData("@ ", FailResult.TagsEmpty)]
-    [InlineData(": ", FailResult.PrefixEmpty)]
-    [InlineData("0", FailResult.CommandFormat)]
-    [InlineData("PING :\u0001ACTION", FailResult.ContentMissingCtcpEnding)]
-    [InlineData("@tag", FailResult.MessageNoCommandMissingTagsEnding)]
-    [InlineData("@tag ", FailResult.MessageNoCommandAfterTagsEnding)]
-    [InlineData("@tag :name", FailResult.MessageNoCommandMissingPrefixEnding)]
-    [InlineData("@tag :name ", FailResult.MessageNoCommandAfterPrefixEnding)]
-    [InlineData("@tag :name PING ", FailResult.MessageTrailingSpaceAfterCommand)]
-    internal void ParseResultTest(string input, FailResult expectedResult)
+    [InlineData("PING", ParseResult.Success)]
+    [InlineData("", ParseResult.MessageEmpty)]
+    [InlineData("@ ", ParseResult.TagsEmpty)]
+    [InlineData(": ", ParseResult.PrefixEmpty)]
+    [InlineData("0", ParseResult.CommandFormat)]
+    [InlineData("PING :\u0001ACTION", ParseResult.ContentMissingCtcpEnding)]
+    [InlineData("@tag", ParseResult.MessageNoCommandMissingTagsEnding)]
+    [InlineData("@tag ", ParseResult.MessageNoCommandAfterTagsEnding)]
+    [InlineData("@tag :name", ParseResult.MessageNoCommandMissingPrefixEnding)]
+    [InlineData("@tag :name ", ParseResult.MessageNoCommandAfterPrefixEnding)]
+    [InlineData("@tag :name PING ", ParseResult.MessageTrailingSpaceAfterCommand)]
+    internal void ParseResultTest(string input, ParseResult expectedResult)
     {
-        FailResult result = Message.Parse(input, out _);
+        ParseResult result = Message.Parse(input, out _);
         Assert.Equal(expectedResult, result);
 
-        if (result is FailResult.None)
+        if (result is ParseResult.Success)
         {
             _ = Message.Parse(input);
         }

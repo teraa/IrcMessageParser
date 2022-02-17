@@ -138,17 +138,17 @@ public class TagsParseTests
     }
 
     [Theory]
-    [InlineData("x", FailResult.None)]
-    [InlineData("", FailResult.TagsEmpty)]
-    [InlineData(";", FailResult.TagsTrailingSemicolon)]
-    [InlineData("x;", FailResult.TagsTrailingSemicolon)]
-    [InlineData("x;;x", FailResult.TagsKeyEmpty)]
-    internal void ParseResultTest(string input, FailResult expectedResult)
+    [InlineData("x", ParseResult.Success)]
+    [InlineData("", ParseResult.TagsEmpty)]
+    [InlineData(";", ParseResult.TagsTrailingSemicolon)]
+    [InlineData("x;", ParseResult.TagsTrailingSemicolon)]
+    [InlineData("x;;x", ParseResult.TagsKeyEmpty)]
+    internal void ParseResultTest(string input, ParseResult expectedResult)
     {
-        FailResult result = Tags.Parse(input, out _);
+        ParseResult result = Tags.Parse(input, out _);
         Assert.Equal(expectedResult, result);
 
-        if (result is FailResult.None)
+        if (result is ParseResult.Success)
         {
             _ = Tags.Parse(input);
         }

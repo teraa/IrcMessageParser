@@ -78,24 +78,24 @@ public class PrefixTests
     }
 
     [Theory]
-    [InlineData("nick!user@host", FailResult.None)]
-    [InlineData("nick!@host", FailResult.PrefixEmptyUser)]
-    [InlineData("nick!user@", FailResult.PrefixEmptyHost)]
-    [InlineData("nick!@", FailResult.PrefixEmptyHost)]
-    [InlineData("nick!", FailResult.PrefixEmptyUser)]
-    [InlineData("nick@", FailResult.PrefixEmptyHost)]
-    [InlineData("!", FailResult.PrefixEmptyUser)]
-    [InlineData("@", FailResult.PrefixEmptyHost)]
-    [InlineData("", FailResult.PrefixEmpty)]
-    [InlineData("!user", FailResult.PrefixEmptyName)]
-    [InlineData("@host", FailResult.PrefixEmptyName)]
-    [InlineData("!user@host", FailResult.PrefixEmptyName)]
-    internal void ParseResultTest(string input, FailResult expectedResult)
+    [InlineData("nick!user@host", ParseResult.Success)]
+    [InlineData("nick!@host", ParseResult.PrefixEmptyUser)]
+    [InlineData("nick!user@", ParseResult.PrefixEmptyHost)]
+    [InlineData("nick!@", ParseResult.PrefixEmptyHost)]
+    [InlineData("nick!", ParseResult.PrefixEmptyUser)]
+    [InlineData("nick@", ParseResult.PrefixEmptyHost)]
+    [InlineData("!", ParseResult.PrefixEmptyUser)]
+    [InlineData("@", ParseResult.PrefixEmptyHost)]
+    [InlineData("", ParseResult.PrefixEmpty)]
+    [InlineData("!user", ParseResult.PrefixEmptyName)]
+    [InlineData("@host", ParseResult.PrefixEmptyName)]
+    [InlineData("!user@host", ParseResult.PrefixEmptyName)]
+    internal void ParseResultTest(string input, ParseResult expectedResult)
     {
-        FailResult result = Prefix.Parse(input, out _);
+        ParseResult result = Prefix.Parse(input, out _);
         Assert.Equal(expectedResult, result);
 
-        if (result is FailResult.None)
+        if (result is ParseResult.Success)
         {
             _ = Prefix.Parse(input);
         }

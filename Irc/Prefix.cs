@@ -55,11 +55,11 @@ public record Prefix
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Prefix Parse(ReadOnlySpan<char> input)
     {
-        FailResult failResult = Parse(input, out Prefix result);
-        if (failResult is FailResult.None)
+        ParseResult parseResult = Parse(input, out Prefix result);
+        if (parseResult is ParseResult.Success)
             return result;
 
-        throw new FormatException(failResult.FailResultToString());
+        throw new FormatException(parseResult.ParseResultToString());
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Prefix)"/>
@@ -74,7 +74,7 @@ public record Prefix
     /// <param name="result">parsed prefix if method returns <see langword="true"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise, <see langword="false"/>.</returns>
     public static bool TryParse(ReadOnlySpan<char> input, out Prefix result)
-        => Parse(input, out result) == FailResult.None;
+        => Parse(input, out result) == ParseResult.Success;
 
     /// <inheritdoc/>
     public override string ToString()
@@ -88,12 +88,12 @@ public record Prefix
         };
     }
 
-    internal static FailResult Parse(ReadOnlySpan<char> input, out Prefix result)
+    internal static ParseResult Parse(ReadOnlySpan<char> input, out Prefix result)
     {
         result = null!;
 
         if (input.IsEmpty)
-            return FailResult.PrefixEmpty;
+            return ParseResult.PrefixEmpty;
 
         string name;
         string? user, host;
@@ -105,7 +105,7 @@ public record Prefix
             ReadOnlySpan<char> hostSpan = input[(i + 1)..];
 
             if (hostSpan.IsEmpty)
-                return FailResult.PrefixEmptyHost;
+                return ParseResult.PrefixEmptyHost;
 
             host = hostSpan.ToString();
             input = input[..i];
@@ -122,7 +122,7 @@ public record Prefix
             ReadOnlySpan<char> userSpan = input[(i + 1)..];
 
             if (userSpan.IsEmpty)
-                return FailResult.PrefixEmptyUser;
+                return ParseResult.PrefixEmptyUser;
 
             user = userSpan.ToString();
             input = input[..i];
@@ -133,12 +133,12 @@ public record Prefix
         }
 
         if (input.IsEmpty)
-            return FailResult.PrefixEmptyName;
+            return ParseResult.PrefixEmptyName;
 
         name = input.ToString();
 
         result = new Prefix(name, user, host);
 
-        return FailResult.None;
+        return ParseResult.Success;
     }
 }

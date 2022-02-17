@@ -53,15 +53,15 @@ public class ContentTests
     }
 
     [Theory]
-    [InlineData("x", FailResult.None)]
-    [InlineData("", FailResult.ContentEmpty)]
-    [InlineData("\u0001ACTION", FailResult.ContentMissingCtcpEnding)]
-    internal void ParseResultTest(string input, FailResult expectedResult)
+    [InlineData("x", ParseResult.Success)]
+    [InlineData("", ParseResult.ContentEmpty)]
+    [InlineData("\u0001ACTION", ParseResult.ContentMissingCtcpEnding)]
+    internal void ParseResultTest(string input, ParseResult expectedResult)
     {
-        FailResult result = Content.Parse(input, out _);
+        ParseResult result = Content.Parse(input, out _);
         Assert.Equal(expectedResult, result);
 
-        if (result is FailResult.None)
+        if (result is ParseResult.Success)
         {
             _ = Content.Parse(input);
         }

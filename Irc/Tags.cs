@@ -43,11 +43,11 @@ public class Tags : IReadOnlyDictionary<string, string>
     /// <exception cref="FormatException"><paramref name="input"/> is empty.</exception>
     public static Tags Parse(ReadOnlySpan<char> input)
     {
-        FailResult failResult = Parse(input, out Tags result);
-        if (failResult is FailResult.None)
+        ParseResult parseResult = Parse(input, out Tags result);
+        if (parseResult is ParseResult.Success)
             return result;
 
-        throw new FormatException(failResult.FailResultToString());
+        throw new FormatException(parseResult.ParseResultToString());
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Tags)"/>
@@ -62,7 +62,7 @@ public class Tags : IReadOnlyDictionary<string, string>
     /// <param name="result">parsed tags if method returns <see langword="true"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise, <see langword="false"/>.</returns>
     public static bool TryParse(ReadOnlySpan<char> input, out Tags result)
-        => Parse(input, out result) == FailResult.None;
+        => Parse(input, out result) == ParseResult.Success;
 
     /// <summary>
     ///     Parses the input as described in the <see href="https://ircv3.net/specs/extensions/message-tags#escaping-values">IRCv3 spec</see>.
@@ -198,12 +198,12 @@ public class Tags : IReadOnlyDictionary<string, string>
     IEnumerator IEnumerable.GetEnumerator()
         => _tags.GetEnumerator();
 
-    internal static FailResult Parse(ReadOnlySpan<char> input, out Tags result)
+    internal static ParseResult Parse(ReadOnlySpan<char> input, out Tags result)
     {
         result = null!;
 
         if (input.IsEmpty)
-            return FailResult.TagsEmpty;
+            return ParseResult.TagsEmpty;
 
         Dictionary<string, string> tags = new();
 
@@ -223,7 +223,7 @@ public class Tags : IReadOnlyDictionary<string, string>
                 input = input[(i + 1)..];
 
                 if (input.IsEmpty)
-                    return FailResult.TagsTrailingSemicolon;
+                    return ParseResult.TagsTrailingSemicolon;
             }
 
             ReadOnlySpan<char> key, value;
@@ -240,7 +240,7 @@ public class Tags : IReadOnlyDictionary<string, string>
             }
 
             if (key.IsEmpty)
-                return FailResult.TagsKeyEmpty;
+                return ParseResult.TagsKeyEmpty;
 
             tags[key.ToString()] = value.ToString();
 
@@ -248,6 +248,6 @@ public class Tags : IReadOnlyDictionary<string, string>
 
         result = new Tags(tags);
 
-        return FailResult.None;
+        return ParseResult.Success;
     }
 }

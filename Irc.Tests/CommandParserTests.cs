@@ -40,20 +40,20 @@ public class CommandParserTests
     }
 
     [Theory]
-    [InlineData("100", FailResult.None)]
-    [InlineData("", FailResult.CommandEmpty)]
-    [InlineData("1", FailResult.CommandFormat)]
-    [InlineData("10", FailResult.CommandFormat)]
-    [InlineData("1000", FailResult.CommandFormat)]
-    [InlineData("-10", FailResult.CommandFormat)]
-    [InlineData("-100", FailResult.CommandFormat)]
-    [InlineData("invalid", FailResult.CommandFormat)]
-    internal void ParseResultTest(string input, FailResult expectedResult)
+    [InlineData("100", ParseResult.Success)]
+    [InlineData("", ParseResult.CommandEmpty)]
+    [InlineData("1", ParseResult.CommandFormat)]
+    [InlineData("10", ParseResult.CommandFormat)]
+    [InlineData("1000", ParseResult.CommandFormat)]
+    [InlineData("-10", ParseResult.CommandFormat)]
+    [InlineData("-100", ParseResult.CommandFormat)]
+    [InlineData("invalid", ParseResult.CommandFormat)]
+    internal void ParseResultTest(string input, ParseResult expectedResult)
     {
-        FailResult result = CommandParser.Parse(input, out _);
+        ParseResult result = CommandParser.Parse(input, out _);
         Assert.Equal(expectedResult, result);
 
-        if (result is FailResult.None)
+        if (result is ParseResult.Success)
         {
             _ = CommandParser.Parse(input);
         }

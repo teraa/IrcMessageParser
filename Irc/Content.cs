@@ -62,11 +62,11 @@ public record Content
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Content Parse(ReadOnlySpan<char> input)
     {
-        FailResult failResult = Parse(input, out Content result);
-        if (failResult is FailResult.None)
+        ParseResult parseResult = Parse(input, out Content result);
+        if (parseResult is ParseResult.Success)
             return result;
 
-        throw new FormatException(failResult.FailResultToString());
+        throw new FormatException(parseResult.ParseResultToString());
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Content)"/>
@@ -81,17 +81,17 @@ public record Content
     /// <param name="result">parsed content if method returns <see langword="true"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise, <see langword="false"/>.</returns>
     public static bool TryParse(ReadOnlySpan<char> input, out Content result)
-        => Parse(input, out result) == FailResult.None;
+        => Parse(input, out result) == ParseResult.Success;
 
     /// <inheritdoc/>
     public override string ToString() => this;
 
-    internal static FailResult Parse(ReadOnlySpan<char> input, out Content result)
+    internal static ParseResult Parse(ReadOnlySpan<char> input, out Content result)
     {
         result = null!;
 
         if (input.IsEmpty)
-            return FailResult.ContentEmpty;
+            return ParseResult.ContentEmpty;
 
         string? ctcp;
         if (input[0] == s_ctcpDelimiter)
@@ -103,7 +103,7 @@ public record Content
             int i = input.IndexOf(' ');
 
             if (i == -1)
-                return FailResult.ContentMissingCtcpEnding;
+                return ParseResult.ContentMissingCtcpEnding;
 
             ctcp = input[..i].ToString();
             input = input[(i + 1)..];
@@ -117,6 +117,6 @@ public record Content
 
         result = new Content(text, ctcp);
 
-        return FailResult.None;
+        return ParseResult.Success;
     }
 }

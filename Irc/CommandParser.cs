@@ -28,11 +28,11 @@ public static class CommandParser
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public static Command Parse(ReadOnlySpan<char> input)
     {
-        FailResult failResult = Parse(input, out Command result);
-        if (failResult is FailResult.None)
+        ParseResult parseResult = Parse(input, out Command result);
+        if (parseResult is ParseResult.Success)
             return result;
 
-        throw new FormatException(failResult.FailResultToString());
+        throw new FormatException(parseResult.ParseResultToString());
     }
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Command)"/>
@@ -47,7 +47,7 @@ public static class CommandParser
     /// <param name="result">parsed command if method returns <see langword="true"/>.</param>
     /// <returns><see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise, <see langword="false"/>.</returns>
     public static bool TryParse(ReadOnlySpan<char> input, out Command result)
-        => Parse(input, out result) == FailResult.None;
+        => Parse(input, out result) == ParseResult.Success;
 
     /// <summary>
     ///     Returns the <see cref="string"/> representation of the <see cref="Command"/>
@@ -62,12 +62,12 @@ public static class CommandParser
         return ((ushort)command).ToString("d3");
     }
 
-    internal static FailResult Parse(ReadOnlySpan<char> input, out Command result)
+    internal static ParseResult Parse(ReadOnlySpan<char> input, out Command result)
     {
         result = 0;
 
         if (input.IsEmpty)
-            return FailResult.CommandEmpty;
+            return ParseResult.CommandEmpty;
 
         if (input.Length == 3 && ushort.TryParse(input, out ushort numeric))
             result = (Command)numeric;
@@ -76,8 +76,8 @@ public static class CommandParser
             && (input[0] is (< '0' or > '9')))
             result = command;
         else
-            return FailResult.CommandFormat;
+            return ParseResult.CommandFormat;
 
-        return FailResult.None;
+        return ParseResult.Success;
     }
 }
