@@ -6,6 +6,13 @@ namespace Teraa.Irc.Tests;
 public class PrefixTests
 {
     [Fact]
+    public void Null_Throws_ArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(
+            () => Prefix.Parse(null!));
+    }
+
+    [Fact]
     public void NameOnly_Parse()
     {
         var raw = "servername";

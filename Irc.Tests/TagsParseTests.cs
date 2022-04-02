@@ -6,6 +6,27 @@ namespace Teraa.Irc.Tests;
 public class TagsParseTests
 {
     [Fact]
+    public void Null_Throws_ArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(
+            () => Tags.Parse(null!));
+    }
+
+    [Fact]
+    public void SingleTag()
+    {
+        var tags = Tags.Parse("key=value");
+
+        Assert.Collection(tags,
+            pair =>
+            {
+                Assert.Equal("key", pair.Key);
+                Assert.Equal("value", pair.Value);
+            }
+        );
+    }
+
+    [Fact]
     public void MultipleTags()
     {
         var tags = Tags.Parse("A;B=;C=c\\;D=d");
@@ -57,20 +78,6 @@ public class TagsParseTests
             pair =>
             {
                 Assert.Equal("+key", pair.Key);
-                Assert.Equal("value", pair.Value);
-            }
-        );
-    }
-
-    [Fact]
-    public void TrailingSemicolon_Ignored()
-    {
-        var tags = Tags.Parse("key=value");
-
-        Assert.Collection(tags,
-            pair =>
-            {
-                Assert.Equal("key", pair.Key);
                 Assert.Equal("value", pair.Value);
             }
         );

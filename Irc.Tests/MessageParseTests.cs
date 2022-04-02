@@ -6,6 +6,13 @@ namespace Teraa.Irc.Tests;
 public class MessageParseTests
 {
     [Fact]
+    public void Null_Throws_ArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(
+            () => Message.Parse(null!));
+    }
+
+    [Fact]
     public void PingCommandOnly()
     {
         var message = Message.Parse("PING");
@@ -237,6 +244,7 @@ public class MessageParseTests
     [InlineData("@ ", ParseResult.TagsEmpty)]
     [InlineData(": ", ParseResult.PrefixEmpty)]
     [InlineData("0", ParseResult.CommandFormat)]
+    [InlineData("0 ", ParseResult.CommandFormat)]
     [InlineData("PING :\u0001ACTION", ParseResult.ContentMissingCtcpEnding)]
     [InlineData("@tag", ParseResult.MessageNoCommandMissingTagsEnding)]
     [InlineData("@tag ", ParseResult.MessageNoCommandAfterTagsEnding)]

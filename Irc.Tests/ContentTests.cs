@@ -6,6 +6,13 @@ namespace Teraa.Irc.Tests;
 public class ContentTests
 {
     [Fact]
+    public void Null_Throws_ArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(
+            () => Content.Parse(null!));
+    }
+
+    [Fact]
     public void NoCtcp_Parse()
     {
         var raw = "text";

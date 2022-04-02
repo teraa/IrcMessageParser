@@ -5,6 +5,13 @@ namespace Teraa.Irc.Tests;
 
 public class CommandParserTests
 {
+    [Fact]
+    public void Null_Throws_ArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(
+            () => CommandParser.Parse(null!));
+    }
+
     [Theory]
     [InlineData("100", (Command)100)]
     [InlineData("005", (Command)005)]
