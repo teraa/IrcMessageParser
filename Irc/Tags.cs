@@ -73,32 +73,34 @@ public class Tags : IReadOnlyDictionary<string, string>
     {
         if (input.IsEmpty) return "";
 
-        StringBuilder result = new();
-        int i = 0;
-        for (int j = 0; j < input.Length - 1; j++)
+        int i = input.IndexOf('\\');
+        if (i == -1 || i == input.Length - 1)
+            return input.ToString();
+
+        StringBuilder result = new(input.Length - 1);
+
+        do
         {
-            if (input[j] == '\\')
+            char next = input[i + 1];
+            char parsed = next switch
             {
-                result.Append(input[i..j]);
+                '\\' => '\\',
+                ':' => ';',
+                's' => ' ',
+                'r' => '\r',
+                'n' => '\n',
+                _ => next
+            };
 
-                j++;
-                char next = input[j];
-                char parsed = next switch
-                {
-                    '\\' => '\\',
-                    ':' => ';',
-                    's' => ' ',
-                    'r' => '\r',
-                    'n' => '\n',
-                    _ => next
-                };
+            result.Append(input[..i]);
+            result.Append(parsed);
 
-                result.Append(parsed);
-                i = j + 1;
-            }
-        }
+            input = input[(i + 2)..];
+            i = input.IndexOf('\\');
 
-        result.Append(input[i..]);
+        } while (i != -1 && i != input.Length - 1);
+
+        result.Append(input);
 
         return result.ToString();
     }

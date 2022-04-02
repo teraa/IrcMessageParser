@@ -35,6 +35,15 @@ public class TagValueTests
     [InlineData(@"\0", "0")]
     [InlineData(@"\?", "?")]
     [InlineData(@"\\s", @"\s")]
+    [InlineData(@"one\stwo\sthree", "one two three")]
+    [InlineData(@"abc\", @"abc\")]
+    [InlineData(@"abc\s", @"abc ")]
+    [InlineData(@"abc\s1", @"abc 1")]
+    [InlineData(@"abc\s12", @"abc 12")]
+    [InlineData(@"abc\s123", @"abc 123")]
+    [InlineData(@"ab\s", @"ab ")]
+    [InlineData(@"a\s", @"a ")]
+    [InlineData(@"plain", @"plain")]
     public void ParseValueTest(string input, string parsed)
     {
         var actualParsed = Tags.ParseValue(input);
