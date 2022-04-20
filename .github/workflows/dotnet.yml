@@ -86,7 +86,7 @@ jobs:
       - name: Push (NuGet.org)
         if: >
           (github.event_name == 'release') ||
-          (github.event_name == 'workflow_dispatch' && github.event.inputs.nuget)
+          (github.event_name == 'workflow_dispatch' && github.event.inputs.nuget == 'true')
         run: dotnet nuget push "nupkgs/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
 
 env:
