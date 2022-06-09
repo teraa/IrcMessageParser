@@ -1,4 +1,5 @@
 using System;
+using JetBrains.Annotations;
 
 namespace Teraa.Irc;
 
@@ -7,6 +8,7 @@ namespace Teraa.Irc;
 ///     Prefix contains information about the server or user sending the message.
 ///     See <see href="https://datatracker.ietf.org/doc/html/rfc1459#section-2.3.1">RFC 1459 Section 2.3.1</see> for details.
 /// </summary>
+[PublicAPI]
 public record Prefix
 {
     /// <summary>

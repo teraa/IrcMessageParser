@@ -1,10 +1,12 @@
 using System;
+using JetBrains.Annotations;
 
 namespace Teraa.Irc;
 
 /// <summary>
 ///     Class for parsing <see cref="Command"/> values.
 /// </summary>
+[PublicAPI]
 public static class CommandParser
 {
     private const Command s_maxNumeric = (Command)999;

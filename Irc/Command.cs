@@ -1,8 +1,11 @@
+using JetBrains.Annotations;
+
 namespace Teraa.Irc;
 
 /// <summary>
 ///     IRC message command.
 /// </summary>
+[PublicAPI]
 public enum Command : ushort
 {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

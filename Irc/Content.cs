@@ -1,4 +1,5 @@
 using System;
+using JetBrains.Annotations;
 
 namespace Teraa.Irc;
 
@@ -6,6 +7,7 @@ namespace Teraa.Irc;
 ///     Record representing content of a <see cref="Message"/>.
 ///     See <see href="https://tools.ietf.org/id/draft-oakley-irc-ctcp-01.html"/> for details.
 /// </summary>
+[PublicAPI]
 public record Content
 {
     private const char s_ctcpDelimiter = '\u0001';

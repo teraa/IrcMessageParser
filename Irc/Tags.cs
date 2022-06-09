@@ -3,12 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using JetBrains.Annotations;
 
 namespace Teraa.Irc;
 
 /// <summary>
 ///     Class representing a collection of key/value pairs of <see cref="Message"/> tags.
 /// </summary>
+[PublicAPI]
 public class Tags : IReadOnlyDictionary<string, string>
 {
     private readonly IReadOnlyDictionary<string, string> _tags;

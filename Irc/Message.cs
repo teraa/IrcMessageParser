@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using JetBrains.Annotations;
 
 namespace Teraa.Irc;
 
@@ -7,6 +8,7 @@ namespace Teraa.Irc;
 ///     Class representing an IRC message.
 ///     Message format is defined in <see href="https://datatracker.ietf.org/doc/html/rfc1459#section-2.3.1">RFC 1459 Section 2.3.1</see>.
 /// </summary>
+[PublicAPI]
 public class Message
 {
     /// <summary>
