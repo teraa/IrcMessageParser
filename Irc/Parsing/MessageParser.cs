@@ -31,6 +31,11 @@ public interface IMessageParser
     /// <inheritdoc cref="TryParse(System.ReadOnlySpan{char},out Teraa.Irc.IMessage)"/>
     bool TryParse(string? input, out IMessage result);
 
+    /// <summary>
+    ///     Returns the <see cref="string"/> representation of the <see cref="IMessage"/>
+    /// </summary>
+    /// <param name="message">Message.</param>
+    /// <returns><see cref="string"/> representing the message.</returns>
     string ToString(IMessage message);
 }
 

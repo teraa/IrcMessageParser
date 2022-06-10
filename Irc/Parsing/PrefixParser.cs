@@ -33,6 +33,11 @@ public interface IPrefixParser
     /// <inheritdoc cref="TryParse(System.ReadOnlySpan{char},out Teraa.Irc.IPrefix)"/>
     bool TryParse(string? input, [NotNullWhen(true)] out IPrefix? result);
 
+    /// <summary>
+    ///     Returns the <see cref="string"/> representation of the <see cref="IPrefix"/>
+    /// </summary>
+    /// <param name="prefix">Prefix.</param>
+    /// <returns><see cref="string"/> representing the prefix.</returns>
     string ToString(IPrefix prefix);
 }
 

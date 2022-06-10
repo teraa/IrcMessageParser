@@ -32,6 +32,11 @@ public interface ICommandParser
     /// <inheritdoc cref="TryParse(System.ReadOnlySpan{char},out Teraa.Irc.Command)"/>
     bool TryParse(string? input, out Command result);
 
+    /// <summary>
+    ///     Returns the <see cref="string"/> representation of the <see cref="Command"/>
+    /// </summary>
+    /// <param name="command">Command.</param>
+    /// <returns><see cref="string"/> representing the command.</returns>
     string ToString(Command command);
 }
 
@@ -96,11 +101,7 @@ public class CommandParser : ICommandParser
         return ParseResult.Success;
     }
 
-    /// <summary>
-    ///     Returns the <see cref="string"/> representation of the <see cref="Command"/>
-    /// </summary>
-    /// <param name="command">Input command.</param>
-    /// <returns><see cref="string"/> representing the command.</returns>
+    /// <inheritdoc />
     public string ToString(Command command)
     {
         if (command > s_maxNumeric)

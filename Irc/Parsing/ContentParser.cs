@@ -33,6 +33,11 @@ public interface IContentParser
     /// <inheritdoc cref="TryParse(System.ReadOnlySpan{char},out Teraa.Irc.IContent)"/>
     bool TryParse(string? input, [NotNullWhen(true)] out IContent? result);
 
+    /// <summary>
+    ///     Returns the <see cref="string"/> representation of the <see cref="IContent"/>
+    /// </summary>
+    /// <param name="content">Content.</param>
+    /// <returns><see cref="string"/> representing the content.</returns>
     string ToString(IContent content);
 }
 

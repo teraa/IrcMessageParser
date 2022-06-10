@@ -34,6 +34,11 @@ public interface ITagsParser
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out ITags)"/>
     bool TryParse(string? input, [NotNullWhen(true)] out ITags? result);
 
+    /// <summary>
+    ///     Returns the <see cref="string"/> representation of the <see cref="ITags"/>
+    /// </summary>
+    /// <param name="tags">Tags.</param>
+    /// <returns><see cref="string"/> representing the tags.</returns>
     string ToString(ITags tags);
 }
 
