@@ -44,7 +44,7 @@ public interface ICommandParser
 [PublicAPI]
 public class CommandParser : ICommandParser
 {
-    private const Command s_maxNumeric = (Command)999;
+    private const Command s_maxNumeric = (Command) 999;
 
     /// <inheritdoc />
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
@@ -90,10 +90,10 @@ public class CommandParser : ICommandParser
             return Result.Empty;
 
         if (input.Length == 3 && ushort.TryParse(input, out ushort numeric))
-            result = (Command)numeric;
+            result = (Command) numeric;
         else if (Enum.TryParse(input, true, out Command command)
-            && command is > s_maxNumeric
-            && (input[0] is (< '0' or > '9')))
+                 && command > s_maxNumeric
+                 && input[0] is < '0' or > '9')
             result = command;
         else
             return Result.InvalidFormat;
@@ -107,7 +107,7 @@ public class CommandParser : ICommandParser
         if (command > s_maxNumeric)
             return command.ToString();
 
-        return ((ushort)command).ToString("d3");
+        return ((ushort) command).ToString("d3");
     }
 
     internal enum Result

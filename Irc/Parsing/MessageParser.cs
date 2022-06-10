@@ -46,19 +46,22 @@ public class MessageParser : IMessageParser
     /// <summary>
     /// <see cref="Command"/> parser.
     /// </summary>
-    public ICommandParser CommandParser { get; set; } =  new CommandParser();
+    public ICommandParser CommandParser { get; set; } = new CommandParser();
+
     /// <summary>
     /// <see cref="ITags"/> parser.
     /// </summary>
-    public ITagsParser TagsParser { get; set; } =  new TagsParser();
+    public ITagsParser TagsParser { get; set; } = new TagsParser();
+
     /// <summary>
     /// <see cref="IPrefix"/> parser.
     /// </summary>
-    public IPrefixParser PrefixParser { get; set; } =  new PrefixParser();
+    public IPrefixParser PrefixParser { get; set; } = new PrefixParser();
+
     /// <summary>
     /// <see cref="IContent"/> parser.
     /// </summary>
-    public IContentParser ContentParser { get; set; } =  new ContentParser();
+    public IContentParser ContentParser { get; set; } = new ContentParser();
 
     /// <inheritdoc />
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
@@ -229,7 +232,7 @@ public class MessageParser : IMessageParser
     {
         StringBuilder result = new();
 
-        if (message.Tags is { Count: > 0 })
+        if (message.Tags is {Count: > 0})
             result
                 .Append('@')
                 .Append(TagsParser.ToString(message.Tags))
@@ -252,7 +255,6 @@ public class MessageParser : IMessageParser
             result
                 .Append(" :")
                 .Append(ContentParser.ToString(message.Content));
-
 
         return result.ToString();
     }
