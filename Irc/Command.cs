@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using NetEscapades.EnumGenerators;
 
 // ReSharper disable IdentifierTypo
 
@@ -8,6 +9,7 @@ namespace Teraa.Irc;
 ///     IRC message command.
 /// </summary>
 [PublicAPI]
+[EnumExtensions]
 public enum Command : ushort
 {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
