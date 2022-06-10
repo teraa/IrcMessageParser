@@ -216,25 +216,23 @@ public class TagsParser : ITagsParser
     /// <inheritdoc />
     public string ToString(ITags tags)
     {
+        if (tags.Count == 0) return "";
+
         StringBuilder result = new();
-
-        if (tags is {Count: > 0})
+        foreach ((string key, string value) in tags)
         {
-            foreach ((string key, string value) in tags)
-            {
-                result.Append(key);
+            result.Append(key);
 
-                if (value is {Length: > 0})
-                    result
-                        .Append('=')
-                        .Append(EscapeValue(value));
+            if (value is {Length: > 0})
+                result
+                    .Append('=')
+                    .Append(EscapeValue(value));
 
-                result.Append(';');
-            }
-
-            // Remove trailing semicolon
-            result.Remove(result.Length - 1, 1);
+            result.Append(';');
         }
+
+        // Remove trailing semicolon
+        result.Remove(result.Length - 1, 1);
 
         return result.ToString();
     }

@@ -90,7 +90,6 @@ public class PrefixParser : IPrefixParser
         if (input.IsEmpty)
             return Result.Empty;
 
-        string name;
         string? user, host;
 
         int i = input.IndexOf('@');
@@ -130,7 +129,7 @@ public class PrefixParser : IPrefixParser
         if (input.IsEmpty)
             return Result.EmptyName;
 
-        name = input.ToString();
+        string name = input.ToString();
 
         result = new Prefix(name, user, host);
 
@@ -140,12 +139,12 @@ public class PrefixParser : IPrefixParser
     /// <inheritdoc/>
     public string ToString(IPrefix prefix)
     {
-        return (prefix.User, prefix.Host) switch
+        return prefix switch
         {
-            (not null, not null) => $"{prefix.Name}!{prefix.User}@{prefix.Host}",
-            (not null, null) => $"{prefix.Name}!{prefix.User}",
-            (null, not null) => $"{prefix.Name}@{prefix.Host}",
-            (null, null) => prefix.Name,
+            {User: not null, Host: not null} => $"{prefix.Name}!{prefix.User}@{prefix.Host}",
+            {User: not null, Host: null} => $"{prefix.Name}!{prefix.User}",
+            {User: null, Host: not null} => $"{prefix.Name}@{prefix.Host}",
+            _ => prefix.Name,
         };
     }
 

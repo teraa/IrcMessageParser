@@ -104,10 +104,9 @@ public class CommandParser : ICommandParser
     /// <inheritdoc />
     public string ToString(Command command)
     {
-        if (command > s_maxNumeric)
-            return command.ToString();
-
-        return ((ushort) command).ToString("d3");
+        return command > s_maxNumeric
+            ? command.ToString()
+            : ((ushort) command).ToString("d3");
     }
 
     internal enum Result
