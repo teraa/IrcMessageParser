@@ -1,6 +1,4 @@
-using System.Text;
 using JetBrains.Annotations;
-using Teraa.Irc.Parsing;
 
 namespace Teraa.Irc;
 
