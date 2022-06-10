@@ -50,14 +50,14 @@ public class CommandParser : ICommandParser
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public Command Parse(ReadOnlySpan<char> input)
     {
-        ParseResult parseResult = Parse(input, out Command result);
-        if (parseResult is ParseResult.Success)
+        Result parseResult = Parse(input, out Command result);
+        if (parseResult is Result.Success)
             return result;
 
         string message = parseResult switch
         {
-            ParseResult.CommandEmpty => "Input is empty",
-            ParseResult.CommandFormat => "Invalid format",
+            Result.Empty => "Input is empty",
+            Result.InvalidFormat => "Invalid format",
             _ => parseResult.ToString()
         };
 
@@ -76,18 +76,18 @@ public class CommandParser : ICommandParser
 
     /// <inheritdoc />
     public bool TryParse(ReadOnlySpan<char> input, out Command result)
-        => Parse(input, out result) == ParseResult.Success;
+        => Parse(input, out result) == Result.Success;
 
     /// <inheritdoc />
     public bool TryParse(string? input, out Command result)
         => TryParse(input.AsSpan(), out result);
 
-    internal static ParseResult Parse(ReadOnlySpan<char> input, out Command result)
+    internal static Result Parse(ReadOnlySpan<char> input, out Command result)
     {
         result = 0;
 
         if (input.IsEmpty)
-            return ParseResult.CommandEmpty;
+            return Result.Empty;
 
         if (input.Length == 3 && ushort.TryParse(input, out ushort numeric))
             result = (Command)numeric;
@@ -96,9 +96,9 @@ public class CommandParser : ICommandParser
             && (input[0] is (< '0' or > '9')))
             result = command;
         else
-            return ParseResult.CommandFormat;
+            return Result.InvalidFormat;
 
-        return ParseResult.Success;
+        return Result.Success;
     }
 
     /// <inheritdoc />
@@ -110,10 +110,10 @@ public class CommandParser : ICommandParser
         return ((ushort)command).ToString("d3");
     }
 
-    internal enum ParseResult
+    internal enum Result
     {
         Success = 0,
-        CommandEmpty,
-        CommandFormat,
+        Empty,
+        InvalidFormat,
     }
 }
