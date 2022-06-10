@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Teraa.Irc.Tests;
 
-public class MessageToStringTests
+public class MessageTests
 {
     [Fact]
     public void CommandOnly()

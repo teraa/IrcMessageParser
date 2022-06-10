@@ -2,11 +2,40 @@ using System;
 using Teraa.Irc.Parsing;
 using Xunit;
 
-namespace Teraa.Irc.Tests;
+namespace Teraa.Irc.Tests.Parsing;
 
-public class TagsParseTests
+public class TagsParserTests
 {
     private readonly TagsParser _parser = new TagsParser();
+
+    [Theory]
+    // Normal
+    [InlineData(@"", @"")]
+    [InlineData(@"x", @"x")]
+    // Special
+    [InlineData(@"\\", @"\")]
+    [InlineData(@"\:", ";")]
+    [InlineData(@"\s", " ")]
+    [InlineData(@"\r", "\r")]
+    [InlineData(@"\n", "\n")]
+    [InlineData(@"\x", "x")]
+    [InlineData(@"\0", "0")]
+    [InlineData(@"\?", "?")]
+    [InlineData(@"\\s", @"\s")]
+    [InlineData(@"one\stwo\sthree", "one two three")]
+    [InlineData(@"abc\", @"abc\")]
+    [InlineData(@"abc\s", @"abc ")]
+    [InlineData(@"abc\s1", @"abc 1")]
+    [InlineData(@"abc\s12", @"abc 12")]
+    [InlineData(@"abc\s123", @"abc 123")]
+    [InlineData(@"ab\s", @"ab ")]
+    [InlineData(@"a\s", @"a ")]
+    [InlineData(@"plain", @"plain")]
+    public void ParseValueTest(string input, string parsed)
+    {
+        var actualParsed = TagsParser.ParseValue(input);
+        Assert.Equal(parsed, actualParsed);
+    }
 
     [Fact]
     public void Null_Throws_ArgumentNullException()

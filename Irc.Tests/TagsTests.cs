@@ -3,8 +3,25 @@ using Xunit;
 
 namespace Teraa.Irc.Tests;
 
-public class TagToStringTests
+public class TagsTests
 {
+    [Theory]
+    // Normal
+    [InlineData(@"", @"")]
+    [InlineData(@"x", @"x")]
+    // Special
+    [InlineData(@"\", @"\\")]
+    [InlineData(";", @"\:")]
+    [InlineData(" ", @"\s")]
+    [InlineData("\r", @"\r")]
+    [InlineData("\n", @"\n")]
+    [InlineData(@"\\ ", @"\\\\\s")]
+    public void EscapeValueTest(string input, string escaped)
+    {
+        var actualEscaped = Tags.EscapeValue(input);
+        Assert.Equal(escaped, actualEscaped);
+    }
+
     [Fact]
     public void SingleTag()
     {

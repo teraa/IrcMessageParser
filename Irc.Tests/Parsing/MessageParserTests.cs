@@ -2,9 +2,9 @@ using System;
 using Teraa.Irc.Parsing;
 using Xunit;
 
-namespace Teraa.Irc.Tests;
+namespace Teraa.Irc.Tests.Parsing;
 
-public class MessageParseTests
+public class MessageParserTests
 {
     private readonly MessageParser _parser = new MessageParser();
 
