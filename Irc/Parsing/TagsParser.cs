@@ -180,11 +180,13 @@ public class TagsParser : ITagsParser
     /// </summary>
     /// <param name="input">Parsed value of a message tag.</param>
     /// <returns>Escaped value of the message tag.</returns>
-    public static string EscapeValue(ReadOnlySpan<char> input)
+    /// <exception cref="ArgumentNullException"><see cref="input"/> is null.</exception>
+    public static string EscapeValue(string input)
     {
-        if (input.IsEmpty) return "";
+        if (input is null) throw new ArgumentNullException(nameof(input));
+        if (input.Length == 0) return input;
 
-        StringBuilder result = new();
+        StringBuilder? result = null;
         int i = 0;
         for (int j = 0; j < input.Length; j++)
         {
@@ -200,15 +202,19 @@ public class TagsParser : ITagsParser
 
             if (escaped is not null)
             {
+                result ??= new();
                 result
-                    .Append(input[i..j])
+                    .Append(input, i, j - i)
                     .Append(escaped);
 
                 i = j + 1;
             }
         }
 
-        result.Append(input[i..]);
+        if (result is null)
+            return input;
+
+        result.Append(input, i, input.Length - i);
 
         return result.ToString();
     }
