@@ -224,21 +224,22 @@ public class TagsParser : ITagsParser
     {
         if (tags.Count == 0) return "";
 
+        bool first = true;
         StringBuilder result = new();
         foreach ((string key, string value) in tags)
         {
+            if (first)
+                first = false;
+            else
+                result.Append(';');
+
             result.Append(key);
 
             if (value is {Length: > 0})
                 result
                     .Append('=')
                     .Append(EscapeValue(value));
-
-            result.Append(';');
         }
-
-        // Remove trailing semicolon
-        result.Remove(result.Length - 1, 1);
 
         return result.ToString();
     }
