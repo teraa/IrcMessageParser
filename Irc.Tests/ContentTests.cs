@@ -1,48 +1,51 @@
 using System;
+using Teraa.Irc.Parsing;
 using Xunit;
 
 namespace Teraa.Irc.Tests;
 
 public class ContentTests
 {
+    private readonly IContentParser _parser = new ContentParser();
+
     [Fact]
     public void Null_Throws_ArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(
-            () => Content.Parse(null!));
+            () => _parser.Parse(null!));
     }
 
     [Fact]
     public void NoCtcp_Parse()
     {
         var raw = "text";
-        var content = Content.Parse(raw);
+        var content = _parser.Parse(raw);
 
         Assert.Equal(raw, content.Text);
         Assert.Null(content.Ctcp);
-        Assert.Equal(raw, content);
+        Assert.Equal(raw, content.ToString());
     }
 
     [Fact]
     public void Ctcp_Parse()
     {
         var raw = "\u0001ACTION text\u0001";
-        var content = Content.Parse(raw);
+        var content = _parser.Parse(raw);
 
         Assert.Equal("text", content.Text);
         Assert.Equal("ACTION", content.Ctcp);
-        Assert.Equal(raw, content);
+        Assert.Equal(raw, content.ToString());
     }
 
     [Fact]
     public void CtcpMissingEndDelimiter_Parse()
     {
         var raw = "\u0001ACTION text";
-        var content = Content.Parse(raw);
+        var content = _parser.Parse(raw);
 
         Assert.Equal("text", content.Text);
         Assert.Equal("ACTION", content.Ctcp);
-        Assert.Equal(raw + "\u0001", content);
+        Assert.Equal(raw + "\u0001", content.ToString());
     }
 
     [Fact]
@@ -60,22 +63,22 @@ public class ContentTests
     }
 
     [Theory]
-    [InlineData("x", ParseResult.Success)]
-    [InlineData("", ParseResult.ContentEmpty)]
-    [InlineData("\u0001ACTION", ParseResult.ContentMissingCtcpEnding)]
-    internal void ParseResultTest(string input, ParseResult expectedResult)
+    [InlineData("x", ContentParser.Result.Success)]
+    [InlineData("", ContentParser.Result.Empty)]
+    [InlineData("\u0001ACTION", ContentParser.Result.MissingCtcpEnding)]
+    internal void ParseResultTest(string input, ContentParser.Result expectedResult)
     {
-        ParseResult result = Content.Parse(input, out _);
+        ContentParser.Result result = ContentParser.Parse(input, out _);
         Assert.Equal(expectedResult, result);
 
-        if (result is ParseResult.Success)
+        if (result is ContentParser.Result.Success)
         {
-            _ = Content.Parse(input);
+            _ = _parser.Parse(input);
         }
         else
         {
             Assert.Throws<FormatException>(
-                () => Content.Parse(input)
+                () => _parser.Parse(input)
             );
         }
     }

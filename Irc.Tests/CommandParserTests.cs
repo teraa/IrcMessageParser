@@ -1,15 +1,18 @@
 using System;
+using Teraa.Irc.Parsing;
 using Xunit;
 
 namespace Teraa.Irc.Tests;
 
 public class CommandParserTests
 {
+    private readonly CommandParser _parser = new CommandParser();
+
     [Fact]
     public void Null_Throws_ArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(
-            () => CommandParser.Parse(null!));
+            () => _parser.Parse(null!));
     }
 
     [Theory]
@@ -28,7 +31,7 @@ public class CommandParserTests
     [InlineData("privmsg", Command.PRIVMSG)]
     public void Parse_Successful(string input, Command expected)
     {
-        var parsed = CommandParser.Parse(input);
+        var parsed = _parser.Parse(input);
         Assert.Equal(expected, parsed);
     }
 
@@ -47,27 +50,27 @@ public class CommandParserTests
     }
 
     [Theory]
-    [InlineData("100", ParseResult.Success)]
-    [InlineData("", ParseResult.CommandEmpty)]
-    [InlineData("1", ParseResult.CommandFormat)]
-    [InlineData("10", ParseResult.CommandFormat)]
-    [InlineData("1000", ParseResult.CommandFormat)]
-    [InlineData("-10", ParseResult.CommandFormat)]
-    [InlineData("-100", ParseResult.CommandFormat)]
-    [InlineData("invalid", ParseResult.CommandFormat)]
-    internal void ParseResultTest(string input, ParseResult expectedResult)
+    [InlineData("100", CommandParser.ParseResult.Success)]
+    [InlineData("", CommandParser.ParseResult.CommandEmpty)]
+    [InlineData("1", CommandParser.ParseResult.CommandFormat)]
+    [InlineData("10", CommandParser.ParseResult.CommandFormat)]
+    [InlineData("1000", CommandParser.ParseResult.CommandFormat)]
+    [InlineData("-10", CommandParser.ParseResult.CommandFormat)]
+    [InlineData("-100", CommandParser.ParseResult.CommandFormat)]
+    [InlineData("invalid", CommandParser.ParseResult.CommandFormat)]
+    internal void ParseResultTest(string input, CommandParser.ParseResult expectedResult)
     {
-        ParseResult result = CommandParser.Parse(input, out _);
+        CommandParser.ParseResult result = CommandParser.Parse(input, out _);
         Assert.Equal(expectedResult, result);
 
-        if (result is ParseResult.Success)
+        if (result is CommandParser.ParseResult.Success)
         {
-            _ = CommandParser.Parse(input);
+            _ = _parser.Parse(input);
         }
         else
         {
             Assert.Throws<FormatException>(
-                () => CommandParser.Parse(input)
+                () => _parser.Parse(input)
             );
         }
     }

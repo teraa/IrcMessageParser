@@ -1,3 +1,4 @@
+using Teraa.Irc.Parsing;
 using Xunit;
 
 namespace Teraa.Irc.Tests;
@@ -46,7 +47,7 @@ public class TagValueTests
     [InlineData(@"plain", @"plain")]
     public void ParseValueTest(string input, string parsed)
     {
-        var actualParsed = Tags.ParseValue(input);
+        var actualParsed = TagsParser.ParseValue(input);
         Assert.Equal(parsed, actualParsed);
     }
 }

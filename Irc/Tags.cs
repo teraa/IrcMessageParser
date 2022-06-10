@@ -8,10 +8,14 @@ using JetBrains.Annotations;
 namespace Teraa.Irc;
 
 /// <summary>
-///     Class representing a collection of key/value pairs of <see cref="Message"/> tags.
+///     Type representing a collection of key/value pairs of <see cref="IMessage"/> tags.
 /// </summary>
 [PublicAPI]
-public class Tags : IReadOnlyDictionary<string, string>
+public interface ITags : IReadOnlyDictionary<string, string> { }
+
+/// <inheritdoc />
+[PublicAPI]
+public class Tags : ITags
 {
     private readonly IReadOnlyDictionary<string, string> _tags;
 
@@ -24,88 +28,32 @@ public class Tags : IReadOnlyDictionary<string, string>
         => _tags = tags ?? throw new ArgumentNullException(nameof(tags));
 
     /// <inheritdoc/>
-    public static implicit operator Tags(Dictionary<string, string> tags)
-        => new(tags);
+    public string this[string key]
+        => _tags[key];
 
-    /// <inheritdoc cref="Parse(ReadOnlySpan{char})"/>
-    /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
-    public static Tags Parse(string input)
-    {
-        if (input is null)
-            throw new ArgumentNullException(nameof(input));
+    /// <inheritdoc/>
+    public IEnumerable<string> Keys
+        => _tags.Keys;
 
-        return Parse(input.AsSpan());
-    }
+    /// <inheritdoc/>
+    public IEnumerable<string> Values
+        => _tags.Values;
 
-    /// <summary>
-    ///     Parses the tags from <paramref name="input"/>.
-    ///     See <see href="https://ircv3.net/specs/extensions/message-tags#format">IRCv3 spec</see> for details.
-    /// </summary>
-    /// <param name="input">Tags part of the IRC message.</param>
-    /// <exception cref="FormatException"><paramref name="input"/> is empty.</exception>
-    public static Tags Parse(ReadOnlySpan<char> input)
-    {
-        ParseResult parseResult = Parse(input, out Tags result);
-        if (parseResult is ParseResult.Success)
-            return result;
+    /// <inheritdoc/>
+    public int Count
+        => _tags.Count;
 
-        throw new FormatException(parseResult.ParseResultToString());
-    }
+    /// <inheritdoc/>
+    public bool ContainsKey(string key)
+        => _tags.ContainsKey(key);
 
-    /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out Tags)"/>
-    public static bool TryParse(string? input, out Tags result)
-        => TryParse(input.AsSpan(), out result);
+    /// <inheritdoc/>
+    public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
+        => _tags.GetEnumerator();
 
-    /// <summary>
-    ///     Parses the tags from <paramref name="input"/>.
-    ///     See <see href="https://ircv3.net/specs/extensions/message-tags#format">IRCv3 spec</see> for details.
-    /// </summary>
-    /// <param name="input">Input to parse.</param>
-    /// <param name="result">parsed tags if method returns <see langword="true"/>.</param>
-    /// <returns><see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise, <see langword="false"/>.</returns>
-    public static bool TryParse(ReadOnlySpan<char> input, out Tags result)
-        => Parse(input, out result) == ParseResult.Success;
-
-    /// <summary>
-    ///     Parses the input as described in the <see href="https://ircv3.net/specs/extensions/message-tags#escaping-values">IRCv3 spec</see>.
-    /// </summary>
-    /// <param name="input">Escaped value of a message tag.</param>
-    /// <returns>Parsed value of the message tag.</returns>
-    public static string ParseValue(ReadOnlySpan<char> input)
-    {
-        if (input.IsEmpty) return "";
-
-        int i = input.IndexOf('\\');
-        if (i == -1 || i == input.Length - 1)
-            return input.ToString();
-
-        StringBuilder result = new(input.Length - 1);
-
-        do
-        {
-            char next = input[i + 1];
-            char parsed = next switch
-            {
-                '\\' => '\\',
-                ':' => ';',
-                's' => ' ',
-                'r' => '\r',
-                'n' => '\n',
-                _ => next
-            };
-
-            result.Append(input[..i]);
-            result.Append(parsed);
-
-            input = input[(i + 2)..];
-            i = input.IndexOf('\\');
-
-        } while (i != -1 && i != input.Length - 1);
-
-        result.Append(input);
-
-        return result.ToString();
-    }
+    /// <inheritdoc/>
+    public bool TryGetValue(string key, [MaybeNullWhen(false)] out string value)
+        => _tags.TryGetValue(key, out value);
 
     /// <summary>
     ///     Escapes input as described in the <see href="https://ircv3.net/specs/extensions/message-tags#escaping-values">IRCv3 spec</see>.
@@ -146,45 +94,17 @@ public class Tags : IReadOnlyDictionary<string, string>
     }
 
     /// <inheritdoc/>
-    public string this[string key]
-        => _tags[key];
-
-    /// <inheritdoc/>
-    public IEnumerable<string> Keys
-        => _tags.Keys;
-
-    /// <inheritdoc/>
-    public IEnumerable<string> Values
-        => _tags.Values;
-
-    /// <inheritdoc/>
-    public int Count
-        => _tags.Count;
-
-    /// <inheritdoc/>
-    public bool ContainsKey(string key)
-        => _tags.ContainsKey(key);
-
-    /// <inheritdoc/>
-    public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
-        => _tags.GetEnumerator();
-
-    /// <inheritdoc/>
-    public bool TryGetValue(string key, [MaybeNullWhen(false)] out string value)
-        => _tags.TryGetValue(key, out value);
-
-    /// <inheritdoc/>
     public override string ToString()
     {
         StringBuilder result = new();
 
-        if (_tags is { Count: > 0 })
+        if (_tags is {Count: > 0})
         {
             foreach ((string key, string value) in _tags)
             {
                 result.Append(key);
 
-                if (value is { Length: > 0 })
+                if (value is {Length: > 0})
                     result
                         .Append('=')
                         .Append(EscapeValue(value));
@@ -201,57 +121,4 @@ public class Tags : IReadOnlyDictionary<string, string>
 
     IEnumerator IEnumerable.GetEnumerator()
         => _tags.GetEnumerator();
-
-    internal static ParseResult Parse(ReadOnlySpan<char> input, out Tags result)
-    {
-        result = null!;
-
-        if (input.IsEmpty)
-            return ParseResult.TagsEmpty;
-
-        Dictionary<string, string> tags = new();
-
-        int i;
-        ReadOnlySpan<char> tag;
-        do
-        {
-            i = input.IndexOf(';');
-            if (i == -1)
-            {
-                tag = input;
-                input = default;
-            }
-            else
-            {
-                tag = input[..i];
-                input = input[(i + 1)..];
-
-                if (input.IsEmpty)
-                    return ParseResult.TagsTrailingSemicolon;
-            }
-
-            ReadOnlySpan<char> key, value;
-            i = tag.IndexOf('=');
-            if (i == -1)
-            {
-                key = tag;
-                value = default;
-            }
-            else
-            {
-                key = tag[..i];
-                value = ParseValue(tag[(i + 1)..]);
-            }
-
-            if (key.IsEmpty)
-                return ParseResult.TagsKeyEmpty;
-
-            tags[key.ToString()] = value.ToString();
-
-        } while (!input.IsEmpty);
-
-        result = new Tags(tags);
-
-        return ParseResult.Success;
-    }
 }

@@ -1,21 +1,24 @@
 using System;
+using Teraa.Irc.Parsing;
 using Xunit;
 
 namespace Teraa.Irc.Tests;
 
 public class MessageParseTests
 {
+    private readonly MessageParser _parser = new MessageParser();
+
     [Fact]
     public void Null_Throws_ArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(
-            () => Message.Parse(null!));
+            () => _parser.Parse(null!));
     }
 
     [Fact]
     public void PingCommandOnly()
     {
-        var message = Message.Parse("PING");
+        var message = _parser.Parse("PING");
 
         Assert.Null(message.Tags);
         Assert.Null(message.Prefix);
@@ -27,7 +30,7 @@ public class MessageParseTests
     [Fact]
     public void PongCommandOnly()
     {
-        var message = Message.Parse("PONG");
+        var message = _parser.Parse("PONG");
 
         Assert.Null(message.Tags);
         Assert.Null(message.Prefix);
@@ -39,9 +42,9 @@ public class MessageParseTests
     [Fact]
     public void PingSingleFlag()
     {
-        var message = Message.Parse("@tag PING");
+        var message = _parser.Parse("@tag PING");
 
-        Assert.Collection(message.Tags,
+        Assert.Collection(message.Tags!,
             tag =>
             {
                 Assert.Equal("tag", tag.Key);
@@ -57,9 +60,9 @@ public class MessageParseTests
     [Fact]
     public void PingSingleFlagPrefix()
     {
-        var message = Message.Parse("@tag :name PING");
+        var message = _parser.Parse("@tag :name PING");
 
-        Assert.Collection(message.Tags,
+        Assert.Collection(message.Tags!,
             tag =>
             {
                 Assert.Equal("tag", tag.Key);
@@ -78,9 +81,9 @@ public class MessageParseTests
     [Fact]
     public void PingSingleTagPrefix()
     {
-        var message = Message.Parse("@key=value :name PING");
+        var message = _parser.Parse("@key=value :name PING");
 
-        Assert.Collection(message.Tags,
+        Assert.Collection(message.Tags!,
             tag =>
             {
                 Assert.Equal("key", tag.Key);
@@ -99,7 +102,7 @@ public class MessageParseTests
     [Fact]
     public void MultiWordArg()
     {
-        var message = Message.Parse(":name PING arg a");
+        var message = _parser.Parse(":name PING arg a");
 
         Assert.Null(message.Tags);
         Assert.NotNull(message.Prefix);
@@ -114,7 +117,7 @@ public class MessageParseTests
     [Fact]
     public void NoArgContent()
     {
-        var message = Message.Parse(":name PING :content c");
+        var message = _parser.Parse(":name PING :content c");
 
         Assert.Null(message.Tags);
         Assert.NotNull(message.Prefix);
@@ -124,13 +127,13 @@ public class MessageParseTests
         Assert.Equal(Command.PING, message.Command);
         Assert.Null(message.Arg);
         Assert.NotNull(message.Content);
-        Assert.Equal("content c", message.Content!);
+        Assert.Equal("content c", message.Content!.ToString());
     }
 
     [Fact]
     public void ArgContent()
     {
-        var message = Message.Parse(":name PONG arg a :content c");
+        var message = _parser.Parse(":name PONG arg a :content c");
 
         Assert.Null(message.Tags);
         Assert.NotNull(message.Prefix);
@@ -140,26 +143,26 @@ public class MessageParseTests
         Assert.Equal(Command.PONG, message.Command);
         Assert.Equal("arg a", message.Arg);
         Assert.NotNull(message.Content);
-        Assert.Equal("content c", message.Content!);
+        Assert.Equal("content c", message.Content!.ToString());
     }
 
     [Fact]
     public void CapReq()
     {
-        var message = Message.Parse("CAP REQ :cap1 cap2");
+        var message = _parser.Parse("CAP REQ :cap1 cap2");
 
         Assert.Null(message.Tags);
         Assert.Null(message.Prefix);
         Assert.Equal(Command.CAP, message.Command);
         Assert.Equal("REQ", message.Arg);
         Assert.NotNull(message.Content);
-        Assert.Equal("cap1 cap2", message.Content!);
+        Assert.Equal("cap1 cap2", message.Content!.ToString());
     }
 
     [Fact]
     public void CapAck()
     {
-        var message = Message.Parse(":name CAP * ACK :cap1 cap2");
+        var message = _parser.Parse(":name CAP * ACK :cap1 cap2");
 
         Assert.Null(message.Tags);
         Assert.NotNull(message.Prefix);
@@ -169,13 +172,13 @@ public class MessageParseTests
         Assert.Equal(Command.CAP, message.Command);
         Assert.Equal("* ACK", message.Arg);
         Assert.NotNull(message.Content);
-        Assert.Equal("cap1 cap2", message.Content!);
+        Assert.Equal("cap1 cap2", message.Content!.ToString());
     }
 
     [Fact]
     public void CommandNumeric()
     {
-        var message = Message.Parse(":name 353 tera = #channel :name1 name2 name3");
+        var message = _parser.Parse(":name 353 tera = #channel :name1 name2 name3");
 
         Assert.Null(message.Tags);
         Assert.NotNull(message.Prefix);
@@ -185,13 +188,13 @@ public class MessageParseTests
         Assert.Equal((Command)353, message.Command);
         Assert.Equal("tera = #channel", message.Arg);
         Assert.NotNull(message.Content);
-        Assert.Equal("name1 name2 name3", message.Content!);
+        Assert.Equal("name1 name2 name3", message.Content!.ToString());
     }
 
     [Fact]
     public void PrivmsgAction()
     {
-        var message = Message.Parse("PRIVMSG #channel :\u0001ACTION Text\u0001");
+        var message = _parser.Parse("PRIVMSG #channel :\u0001ACTION Text\u0001");
 
         Assert.Null(message.Tags);
         Assert.Null(message.Prefix);
@@ -205,7 +208,7 @@ public class MessageParseTests
     [Fact]
     public void PrivmsgMissingActionEnd()
     {
-        var message = Message.Parse("PRIVMSG #channel :\u0001ACTION Text");
+        var message = _parser.Parse("PRIVMSG #channel :\u0001ACTION Text");
 
         Assert.Null(message.Tags);
         Assert.Null(message.Prefix);
@@ -217,11 +220,11 @@ public class MessageParseTests
     }
 
     [Fact]
-    public void PrivMsgValueTag()
+    public void PrivmsgValueTag()
     {
-        var message = Message.Parse("@key=value :nick!user@host PRIVMSG #channel :message");
+        var message = _parser.Parse("@key=value :nick!user@host PRIVMSG #channel :message");
 
-        Assert.Collection(message.Tags,
+        Assert.Collection(message.Tags!,
             tag =>
             {
                 Assert.Equal("key", tag.Key);
@@ -235,35 +238,35 @@ public class MessageParseTests
         Assert.Equal(Command.PRIVMSG, message.Command);
         Assert.Equal("#channel", message.Arg);
         Assert.NotNull(message.Content);
-        Assert.Equal("message", message.Content!);
+        Assert.Equal("message", message.Content!.ToString());
     }
 
     [Theory]
-    [InlineData("PING", ParseResult.Success)]
-    [InlineData("", ParseResult.MessageEmpty)]
-    [InlineData("@ ", ParseResult.TagsEmpty)]
-    [InlineData(": ", ParseResult.PrefixEmpty)]
-    [InlineData("0", ParseResult.CommandFormat)]
-    [InlineData("0 ", ParseResult.CommandFormat)]
-    [InlineData("PING :\u0001ACTION", ParseResult.ContentMissingCtcpEnding)]
-    [InlineData("@tag", ParseResult.MessageNoCommandMissingTagsEnding)]
-    [InlineData("@tag ", ParseResult.MessageNoCommandAfterTagsEnding)]
-    [InlineData("@tag :name", ParseResult.MessageNoCommandMissingPrefixEnding)]
-    [InlineData("@tag :name ", ParseResult.MessageNoCommandAfterPrefixEnding)]
-    [InlineData("@tag :name PING ", ParseResult.MessageTrailingSpaceAfterCommand)]
-    internal void ParseResultTest(string input, ParseResult expectedResult)
+    [InlineData("PING", MessageParser.Result.Success)]
+    [InlineData("", MessageParser.Result.Empty)]
+    [InlineData("@ ", MessageParser.Result.InvalidTags)]
+    [InlineData(": ", MessageParser.Result.InvalidPrefix)]
+    [InlineData("0", MessageParser.Result.InvalidCommand)]
+    [InlineData("0 ", MessageParser.Result.InvalidCommand)]
+    [InlineData("PING :\u0001ACTION", MessageParser.Result.InvalidContent)]
+    [InlineData("@tag", MessageParser.Result.NoCommandMissingTagsEnding)]
+    [InlineData("@tag ", MessageParser.Result.NoCommandAfterTagsEnding)]
+    [InlineData("@tag :name", MessageParser.Result.NoCommandMissingPrefixEnding)]
+    [InlineData("@tag :name ", MessageParser.Result.NoCommandAfterPrefixEnding)]
+    [InlineData("@tag :name PING ", MessageParser.Result.TrailingSpaceAfterCommand)]
+    internal void ParseResultTest(string input, MessageParser.Result expectedResult)
     {
-        ParseResult result = Message.Parse(input, out _);
+        MessageParser.Result result = _parser.Parse(input, out _);
         Assert.Equal(expectedResult, result);
 
-        if (result is ParseResult.Success)
+        if (result is MessageParser.Result.Success)
         {
-            _ = Message.Parse(input);
+            _ = _parser.Parse(input);
         }
         else
         {
             Assert.Throws<FormatException>(
-                () => Message.Parse(input)
+                () => _parser.Parse(input)
             );
         }
     }
