@@ -180,7 +180,7 @@ public class TagsParser : ITagsParser
     /// </summary>
     /// <param name="input">Parsed value of a message tag.</param>
     /// <returns>Escaped value of the message tag.</returns>
-    /// <exception cref="ArgumentNullException"><see cref="input"/> is null.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="input"/> is null.</exception>
     public static string EscapeValue(string input)
     {
         if (input is null) throw new ArgumentNullException(nameof(input));
