@@ -31,6 +31,8 @@ public interface ICommandParser
 
     /// <inheritdoc cref="TryParse(System.ReadOnlySpan{char},out Teraa.Irc.Command)"/>
     bool TryParse(string? input, out Command result);
+
+    string ToString(Command command);
 }
 
 /// <inheritdoc />
@@ -75,19 +77,6 @@ public class CommandParser : ICommandParser
     public bool TryParse(string? input, out Command result)
         => TryParse(input.AsSpan(), out result);
 
-    /// <summary>
-    ///     Returns the <see cref="string"/> representation of the <see cref="Command"/>
-    /// </summary>
-    /// <param name="command">Input command.</param>
-    /// <returns><see cref="string"/> representing the command.</returns>
-    public static string ToString(Command command)
-    {
-        if (command > s_maxNumeric)
-            return command.ToString();
-
-        return ((ushort)command).ToString("d3");
-    }
-
     internal static ParseResult Parse(ReadOnlySpan<char> input, out Command result)
     {
         result = 0;
@@ -105,6 +94,19 @@ public class CommandParser : ICommandParser
             return ParseResult.CommandFormat;
 
         return ParseResult.Success;
+    }
+
+    /// <summary>
+    ///     Returns the <see cref="string"/> representation of the <see cref="Command"/>
+    /// </summary>
+    /// <param name="command">Input command.</param>
+    /// <returns><see cref="string"/> representing the command.</returns>
+    public string ToString(Command command)
+    {
+        if (command > s_maxNumeric)
+            return command.ToString();
+
+        return ((ushort)command).ToString("d3");
     }
 
     internal enum ParseResult

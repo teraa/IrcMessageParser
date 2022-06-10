@@ -12,6 +12,7 @@ public interface IContent
     ///     Content text.
     /// </summary>
     string Text { get; }
+
     /// <summary>
     ///     Client-to-Client Protocol command.
     /// </summary>
@@ -23,13 +24,4 @@ public interface IContent
 public record Content(
     string Text,
     string? Ctcp = null
-): IContent
-{
-    internal const char CtcpDelimiter = '\u0001';
-
-    /// <inheritdoc/>
-    public override string ToString()
-        => Ctcp is null
-            ? Text
-            : $"{CtcpDelimiter}{Ctcp} {Text}{CtcpDelimiter}";
-}
+) : IContent;

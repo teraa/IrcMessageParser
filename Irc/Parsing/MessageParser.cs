@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using JetBrains.Annotations;
 
 namespace Teraa.Irc.Parsing;
@@ -29,6 +30,8 @@ public interface IMessageParser
 
     /// <inheritdoc cref="TryParse(System.ReadOnlySpan{char},out Teraa.Irc.IMessage)"/>
     bool TryParse(string? input, out IMessage result);
+
+    string ToString(IMessage message);
 }
 
 /// <inheritdoc />
@@ -214,6 +217,39 @@ public class MessageParser : IMessageParser
         result = new Message(command, tags, prefix, arg, content);
 
         return Result.Success;
+    }
+
+    /// <inheritdoc />
+    public string ToString(IMessage message)
+    {
+        StringBuilder result = new();
+
+        if (message.Tags is { Count: > 0 })
+            result
+                .Append('@')
+                .Append(TagsParser.ToString(message.Tags))
+                .Append(' ');
+
+        if (message.Prefix is not null)
+            result
+                .Append(':')
+                .Append(PrefixParser.ToString(message.Prefix))
+                .Append(' ');
+
+        result.Append(CommandParser.ToString(message.Command));
+
+        if (message.Arg is not null)
+            result
+                .Append(' ')
+                .Append(message.Arg);
+
+        if (message.Content is not null)
+            result
+                .Append(" :")
+                .Append(ContentParser.ToString(message.Content));
+
+
+        return result.ToString();
     }
 
     internal enum Result

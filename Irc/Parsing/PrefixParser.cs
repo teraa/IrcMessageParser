@@ -32,6 +32,8 @@ public interface IPrefixParser
 
     /// <inheritdoc cref="TryParse(System.ReadOnlySpan{char},out Teraa.Irc.IPrefix)"/>
     bool TryParse(string? input, [NotNullWhen(true)] out IPrefix? result);
+
+    string ToString(IPrefix prefix);
 }
 
 /// <inheritdoc />
@@ -128,6 +130,18 @@ public class PrefixParser : IPrefixParser
         result = new Prefix(name, user, host);
 
         return Result.Success;
+    }
+
+    /// <inheritdoc/>
+    public string ToString(IPrefix prefix)
+    {
+        return (prefix.User, prefix.Host) switch
+        {
+            (not null, not null) => $"{prefix.Name}!{prefix.User}@{prefix.Host}",
+            (not null, null) => $"{prefix.Name}!{prefix.User}",
+            (null, not null) => $"{prefix.Name}@{prefix.Host}",
+            (null, null) => prefix.Name,
+        };
     }
 
     internal enum Result

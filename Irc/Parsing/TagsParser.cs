@@ -33,6 +33,8 @@ public interface ITagsParser
 
     /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, out ITags)"/>
     bool TryParse(string? input, [NotNullWhen(true)] out ITags? result);
+
+    string ToString(ITags tags);
 }
 
 /// <inheritdoc />
@@ -76,7 +78,7 @@ public class TagsParser : ITagsParser
     public bool TryParse(string? input, [NotNullWhen(true)] out ITags? result)
         => TryParse(input.AsSpan(), out result);
 
-     /// <summary>
+    /// <summary>
     ///     Parses the input as described in the <see href="https://ircv3.net/specs/extensions/message-tags#escaping-values">IRCv3 spec</see>.
     /// </summary>
     /// <param name="input">Escaped value of a message tag.</param>
@@ -116,7 +118,7 @@ public class TagsParser : ITagsParser
         return result.ToString();
     }
 
-     internal static Result Parse(ReadOnlySpan<char> input, out ITags result)
+    internal static Result Parse(ReadOnlySpan<char> input, out ITags result)
     {
         result = null!;
 
@@ -161,12 +163,75 @@ public class TagsParser : ITagsParser
                 return Result.KeyEmpty;
 
             tags[key.ToString()] = value.ToString();
-
         } while (!input.IsEmpty);
 
         result = new Tags(tags);
 
         return Result.Success;
+    }
+
+    /// <summary>
+    ///     Escapes input as described in the <see href="https://ircv3.net/specs/extensions/message-tags#escaping-values">IRCv3 spec</see>.
+    /// </summary>
+    /// <param name="input">Parsed value of a message tag.</param>
+    /// <returns>Escaped value of the message tag.</returns>
+    public static string EscapeValue(ReadOnlySpan<char> input)
+    {
+        if (input.IsEmpty) return "";
+
+        StringBuilder result = new();
+        int i = 0;
+        for (int j = 0; j < input.Length; j++)
+        {
+            string? escaped = input[j] switch
+            {
+                '\\' => @"\\",
+                ';' => @"\:",
+                ' ' => @"\s",
+                '\r' => @"\r",
+                '\n' => @"\n",
+                _ => null
+            };
+
+            if (escaped is not null)
+            {
+                result
+                    .Append(input[i..j])
+                    .Append(escaped);
+
+                i = j + 1;
+            }
+        }
+
+        result.Append(input[i..]);
+
+        return result.ToString();
+    }
+
+    /// <inheritdoc />
+    public string ToString(ITags tags)
+    {
+        StringBuilder result = new();
+
+        if (tags is {Count: > 0})
+        {
+            foreach ((string key, string value) in tags)
+            {
+                result.Append(key);
+
+                if (value is {Length: > 0})
+                    result
+                        .Append('=')
+                        .Append(EscapeValue(value));
+
+                result.Append(';');
+            }
+
+            // Remove trailing semicolon
+            result.Remove(result.Length - 1, 1);
+        }
+
+        return result.ToString();
     }
 
     internal enum Result

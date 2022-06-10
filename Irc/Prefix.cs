@@ -33,17 +33,4 @@ public record Prefix(
     string Name,
     string? User = null,
     string? Host = null
-) : IPrefix
-{
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        return (User, Host) switch
-        {
-            (not null, not null) => $"{Name}!{User}@{Host}",
-            (not null, null) => $"{Name}!{User}",
-            (null, not null) => $"{Name}@{Host}",
-            (null, null) => Name,
-        };
-    }
-}
+) : IPrefix;

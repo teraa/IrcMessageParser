@@ -2,23 +2,23 @@ using System;
 using Teraa.Irc.Parsing;
 using Xunit;
 
-namespace Teraa.Irc.Tests.Parsing;
+namespace Teraa.Irc.Tests;
 
 public class CommandParserTests
 {
     private readonly CommandParser _parser = new CommandParser();
 
     [Fact]
-    public void Null_Throws_ArgumentNullException()
+    public void Parse_Null_Throws_ArgumentNullException()
     {
         Assert.Throws<ArgumentNullException>(
             () => _parser.Parse(null!));
     }
 
     [Theory]
-    [InlineData("100", (Command)100)]
-    [InlineData("005", (Command)005)]
-    [InlineData("999", (Command)999)]
+    [InlineData("100", (Command) 100)]
+    [InlineData("005", (Command) 005)]
+    [InlineData("999", (Command) 999)]
     [InlineData("CAP", Command.CAP)]
     [InlineData("GLOBALUSERSTATE", Command.GLOBALUSERSTATE)]
     [InlineData("PING", Command.PING)]
@@ -41,11 +41,11 @@ public class CommandParserTests
     [InlineData(Command.CAP, "CAP")]
     [InlineData(Command.RPL_TRACELINK, "200")]
     [InlineData(Command.RPL_ADMINEMAIL, "259")]
-    [InlineData((Command)100, "100")]
-    [InlineData((Command)999, "999")]
-    public void ToStringTest(Command command, string expected)
+    [InlineData((Command) 100, "100")]
+    [InlineData((Command) 999, "999")]
+    public void ToString_Test(Command command, string expected)
     {
-        var actual = CommandParser.ToString(command);
+        var actual = _parser.ToString(command);
         Assert.Equal(expected, actual);
     }
 
@@ -58,7 +58,7 @@ public class CommandParserTests
     [InlineData("-10", CommandParser.ParseResult.CommandFormat)]
     [InlineData("-100", CommandParser.ParseResult.CommandFormat)]
     [InlineData("invalid", CommandParser.ParseResult.CommandFormat)]
-    internal void ParseResultTest(string input, CommandParser.ParseResult expectedResult)
+    internal void Parse_ResultTest(string input, CommandParser.ParseResult expectedResult)
     {
         CommandParser.ParseResult result = CommandParser.Parse(input, out _);
         Assert.Equal(expectedResult, result);

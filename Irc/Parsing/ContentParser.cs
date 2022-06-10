@@ -32,12 +32,16 @@ public interface IContentParser
 
     /// <inheritdoc cref="TryParse(System.ReadOnlySpan{char},out Teraa.Irc.IContent)"/>
     bool TryParse(string? input, [NotNullWhen(true)] out IContent? result);
+
+    string ToString(IContent content);
 }
 
 /// <inheritdoc />
 [PublicAPI]
 public class ContentParser : IContentParser
 {
+    private const char s_ctcpDelimiter = '\u0001';
+
     /// <inheritdoc />
     /// <exception cref="FormatException"><paramref name="input"/> is not in a valid format.</exception>
     public IContent Parse(ReadOnlySpan<char> input)
@@ -82,10 +86,10 @@ public class ContentParser : IContentParser
             return Result.Empty;
 
         string? ctcp;
-        if (input[0] == Content.CtcpDelimiter)
+        if (input[0] == s_ctcpDelimiter)
         {
             input = input[1..];
-            if (input[^1] == Content.CtcpDelimiter)
+            if (input[^1] == s_ctcpDelimiter)
                 input = input[..^1];
 
             int i = input.IndexOf(' ');
@@ -107,6 +111,12 @@ public class ContentParser : IContentParser
 
         return Result.Success;
     }
+
+    /// <inheritdoc/>
+    public string ToString(IContent content)
+        => content.Ctcp is null
+            ? content.Text
+            : $"{s_ctcpDelimiter}{content.Ctcp} {content.Text}{s_ctcpDelimiter}";
 
     internal enum Result
     {

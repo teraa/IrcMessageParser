@@ -15,18 +15,22 @@ public interface IMessage
     ///     IRC command.
     /// </summary>
     Command Command { get; }
+
     /// <summary>
     ///     Message tags.
     /// </summary>
     ITags? Tags { get; }
+
     /// <summary>
     ///     Message prefix.
     /// </summary>
     IPrefix? Prefix { get; }
+
     /// <summary>
     ///     Message argument.
     /// </summary>
     string? Arg { get; }
+
     /// <summary>
     ///     Message content.
     /// </summary>
@@ -41,39 +45,4 @@ public record Message(
     IPrefix? Prefix = null,
     string? Arg = null,
     IContent? Content = null
-) : IMessage
-{
-
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        StringBuilder result = new();
-
-        if (Tags is { Count: > 0 })
-            result
-                .Append('@')
-                .Append(Tags)
-                .Append(' ');
-
-        if (Prefix is not null)
-            result
-                .Append(':')
-                .Append(Prefix)
-                .Append(' ');
-
-        result.Append(CommandParser.ToString(Command));
-
-        if (Arg is not null)
-            result
-                .Append(' ')
-                .Append(Arg);
-
-        if (Content is not null)
-            result
-                .Append(" :")
-                .Append(Content);
-
-
-        return result.ToString();
-    }
-}
+) : IMessage;
