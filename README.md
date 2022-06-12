@@ -7,6 +7,7 @@ Library containing types and parsers for IRC message, as specified in [RFC 1459]
 Compatible with [Twitch Messaging Interface (TMI)](https://dev.twitch.tv/docs/irc).
 
 Library provides multiple implementations of parsers, depending on the needs.
+Custom parsers can be implemented by implementing one of the appropriate interfaces; `ICommandParser`, `IContentParser`, `ITagsParser`, `IPrefixParser` and/or `IMessageParser`.
 ### `ITagsParser` implementations
 - `TagsParser` - default implementation, validates and parses all of the message tags (both keys and values) in a dictionary.
 This allocates most memory.
@@ -29,7 +30,7 @@ using System.Diagnostics;
 using Teraa.Irc;
 using Teraa.Irc.Parsing;
 
-// Recommended for TMI
+// Recommended for Twitch
 var parser = new MessageParser
 {
     TagsParser = new LazyTagsParser(),
