@@ -41,12 +41,11 @@ public class LazyTags : ITags
             if (_tags is not null)
                 return _tags[key];
 
-            string escapedKey = TagsParser.EscapeValue(key);
-            int i = RawValue.LastIndexOf(escapedKey, StringComparison.Ordinal);
+            int i = RawValue.LastIndexOf(key, StringComparison.Ordinal);
             if (i == -1 || (i != 0 && RawValue[i - 1] != ';'))
                 throw new KeyNotFoundException($"Key '{key}' was not found.");
 
-            int j = RawValue.IndexOf(';', i + escapedKey.Length);
+            int j = RawValue.IndexOf(';', i + key.Length);
 
             return j == -1
                 ? RawValue[i..]
