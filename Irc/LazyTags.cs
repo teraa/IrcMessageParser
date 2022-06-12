@@ -41,15 +41,22 @@ public class LazyTags : ITags
             if (_tags is not null)
                 return _tags[key];
 
-            int i = RawValue.LastIndexOf(key, StringComparison.Ordinal);
-            if (i == -1 || (i != 0 && RawValue[i - 1] != ';'))
+            var span = RawValue.AsSpan();
+
+            int i = span.LastIndexOf(key, StringComparison.Ordinal);
+            if (i == -1 || (i != 0 && span[i - 1] != ';'))
                 throw new KeyNotFoundException($"Key '{key}' was not found.");
 
-            int j = RawValue.IndexOf(';', i + key.Length);
+            span = span[(i + key.Length)..];
 
-            return j == -1
-                ? RawValue[i..]
-                : RawValue[i..j];
+            i = span.IndexOf(';');
+            if (i != -1)
+                span = span[..i];
+
+            if (span.IsEmpty)
+                return "";
+
+            return span[1..].ToString();
         }
     }
 

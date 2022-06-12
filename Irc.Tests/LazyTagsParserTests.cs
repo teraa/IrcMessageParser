@@ -7,6 +7,17 @@ public class LazyTagsParserTests
 {
     private readonly LazyTagsParser _parser = new LazyTagsParser();
 
+    [Theory]
+    [InlineData("key=value", "key", "value")]
+    [InlineData("key=", "key", "")]
+    [InlineData("key", "key", "")]
+    [InlineData("a;b=1;c=2", "b", "1")]
+    public void Indexer_Tests(string input, string key, string expectedValue)
+    {
+        var tags = _parser.Parse(input);
+        Assert.Equal(expectedValue, tags[key]);
+    }
+
     [Fact]
     public void Parse_SingleTag()
     {
