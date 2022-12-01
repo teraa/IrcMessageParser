@@ -14,25 +14,20 @@ on:
         required: true
         type: boolean
         default: false
-      github_packages:
-        description: 'Publish to GitHub Packages'
-        required: true
-        type: boolean
-        default: true
 
 jobs:
-  build:
-    name: Build
+  publish:
+    name: Publish
 
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '7.0.x'
 
       - name: Restore dependencies
         run: dotnet restore
@@ -43,58 +38,33 @@ jobs:
       - name: Test
         run: dotnet test --configuration Release --no-build --verbosity minimal
 
-      - name: Pack (Prerelease)
-        id: pack-prerelease
-        if: >
-          (github.event_name == 'push') ||
-          (github.event_name == 'workflow_dispatch')
-        run: dotnet pack --configuration Release --no-build --output nupkgs -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg --version-suffix alpha.$GITHUB_RUN_NUMBER
+      - name: Pack
+        id: pack
+        if: contains(fromJson('["push", "workflow_dispatch", "release"]'), github.event_name)
+        run: |
+          set -x
+          options=(
+            --configuration Release
+            --no-build
+            --output nupkgs
+            -p:IncludeSymbols=true
+            -p:SymbolPackageFormat=snupkg
+          )
 
-      - name: Pack (Release)
-        id: pack-release
-        if: github.event_name == 'release'
-        run: dotnet pack --configuration Release --no-build --output nupkgs -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
+          if [[ ${{ github.event_name }} != release ]]; then
+            options+=(--version-suffix alpha.$GITHUB_RUN_NUMBER)
+          fi
 
-      - name: Upload Artifacts
-        if: >
-          (steps.pack-release.outcome == 'success') ||
-          (steps.pack-prerelease.outcome == 'success')
-        uses: actions/upload-artifact@v2
-        with:
-          name: nupkgs
-          path: nupkgs
+          dotnet pack ${options[@]}
 
-  publish:
-    if: >
-      (github.event_name == 'push') ||
-      (github.event_name == 'release') ||
-      (github.event_name == 'workflow_dispatch')
-    name: Publish
-    needs: [ build ]
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '6.0.x'
-
-      - name: Download Artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: nupkgs
-          path: nupkgs
-
-      - name: Push (GitHub Packages)
-        if: >
-          (github.event_name != 'workflow_dispatch') ||
-          (github.event.inputs.github_packages == 'true')
+      - name: Push (GitHub)
+        if: steps.pack.outcome == 'success'
         run: dotnet nuget push "nupkgs/*.nupkg" --source https://nuget.pkg.github.com/teraa/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
 
       - name: Push (NuGet.org)
         if: >
-          (github.event_name == 'release') ||
-          (github.event_name == 'workflow_dispatch' && github.event.inputs.nuget == 'true')
+          (steps.pack.outcome == 'success') &&
+          ((github.event_name == 'release') || (github.event.inputs.nuget == 'true'))
         run: dotnet nuget push "nupkgs/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }} --skip-duplicate
 
 env:
