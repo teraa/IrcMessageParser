@@ -163,4 +163,44 @@ public class LazyTagsParserTests
         var tags = new LazyTags("");
         Assert.Equal("", _parser.ToString(tags));
     }
+
+    [Fact]
+    public void RepeatedKey_WithSuffix_Before()
+    {
+        var tags = new LazyTags("key2=value;key=value");
+
+        var roomId = tags["key"];
+
+        Assert.Equal("value", roomId);
+    }
+
+    [Fact]
+    public void RepeatedKey_WithSuffix_After()
+    {
+        var tags = new LazyTags("key=value;key2=value");
+
+        var roomId = tags["key"];
+
+        Assert.Equal("value", roomId);
+    }
+
+    [Fact]
+    public void RepeatedKey_WithPrefix_Before()
+    {
+        var tags = new LazyTags("2key=value;key=value");
+
+        var roomId = tags["key"];
+
+        Assert.Equal("value", roomId);
+    }
+
+    [Fact]
+    public void RepeatedKey_WithPrefix_After()
+    {
+        var tags = new LazyTags("key=value;2key=value");
+
+        var roomId = tags["key"];
+
+        Assert.Equal("value", roomId);
+    }
 }
